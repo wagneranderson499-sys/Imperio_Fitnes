@@ -13,10 +13,10 @@ public class Aluno {
  @Column(nullable=false) public String papel="CLIENTE";
  @Column(name="data_nascimento") public LocalDate dataNascimento;
  @Column(name="celular",length=20) public String celular;
- @Column(nullable=false) public boolean notificacoesAtivas=true;
+ @Column public Boolean notificacoesAtivas=true;
  @Column(length=100) public String planoAtual;
- @Column(nullable=false,length=24) public String situacaoPlano="AGUARDANDO";
- @Column(nullable=false,length=24) public String cadastroFacial="PELO_APLICATIVO";
+ @Column(length=24) public String situacaoPlano="AGUARDANDO";
+ @Column(length=24) public String cadastroFacial="PELO_APLICATIVO";
  public java.time.LocalDate vencimentoPlano;
  @Column(unique=true,length=80) public String tokenAtivacao;
  public java.time.LocalDateTime expiracaoAtivacao;
