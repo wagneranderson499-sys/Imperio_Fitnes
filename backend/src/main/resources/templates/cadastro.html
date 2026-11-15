@@ -46,9 +46,9 @@
       <button id="tab-cadastro" class="tab rounded-lg py-3 font-bold text-sm border" type="button" role="tab" aria-controls="painel-cadastro" onclick="switchMode('cadastro')">Criar conta</button>
       <button id="tab-login" class="tab rounded-lg py-3 font-bold text-sm border" type="button" role="tab" aria-controls="painel-login" onclick="switchMode('login')">Entrar</button>
      </div>
-     <div th:if="${erro}" role="alert" class="mb-5 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200" th:text="${erro}"></div>
-     <div th:if="${sucesso}" role="status" class="mb-5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200" th:text="${sucesso}"></div>
-     <div th:if="${param.error}" role="alert" class="mb-5 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">E-mail ou senha inválidos. Tente novamente.</div>
+     <div th:if="${erro}" style="display:none" th:style="${erro} ? '' : 'display:none'" role="alert" class="mb-5 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200" th:text="${erro}"></div>
+     <div th:if="${sucesso}" style="display:none" th:style="${sucesso} ? '' : 'display:none'" role="status" class="mb-5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200" th:text="${sucesso}"></div>
+     <div th:if="${param.error}" style="display:none" th:style="${param.error} ? '' : 'display:none'" role="alert" class="mb-5 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">E-mail ou senha inválidos. Tente novamente.</div>
      <div id="painel-cadastro" role="tabpanel" aria-labelledby="tab-cadastro">
       <h2 class="text-4xl sm:text-5xl font-black uppercase">Crie sua <span class="text-amber-400">conta.</span></h2>
       <p class="text-zinc-400 mt-2 mb-7 text-sm leading-6">Preencha seus dados para iniciar sua matrícula.</p>
