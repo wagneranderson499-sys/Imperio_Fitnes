@@ -13,6 +13,11 @@ public class Aluno {
  @Column(nullable=false) public String papel="CLIENTE";
  @Column(name="data_nascimento") public LocalDate dataNascimento;
  @Column(name="celular",length=20) public String celular;
+ @Column(nullable=false) public boolean notificacoesAtivas=true;
+ @Column(length=100) public String planoAtual;
+ @Column(nullable=false,length=24) public String situacaoPlano="AGUARDANDO";
+ @Column(nullable=false,length=24) public String cadastroFacial="PELO_APLICATIVO";
+ public java.time.LocalDate vencimentoPlano;
  protected Aluno() {}
  public Aluno(String nome,String email,String senhaHash){this.nome=nome;this.email=email;this.senhaHash=senhaHash;}
  public Aluno(String nome,String email,String senhaHash,LocalDate dataNascimento,String celular){
