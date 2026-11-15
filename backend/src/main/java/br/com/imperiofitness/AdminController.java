@@ -42,17 +42,8 @@ public class AdminController {
   model.addAttribute("totalFacial",lista.stream().filter(a->!"CONCLUIDO".equals(a.cadastroFacial)).count());
   return "admin/dashboard";
  }
- @GetMapping(value="/home",produces=MediaType.TEXT_HTML_VALUE)
- @ResponseBody
- public ResponseEntity<byte[]> home() throws IOException{
-  byte[] html=new ClassPathResource("static/admin-v4.html").getInputStream().readAllBytes();
-  String page=new String(html,java.nio.charset.StandardCharsets.UTF_8);
-  String navigation="<nav aria-label='Áreas administrativas' style='position:fixed;bottom:18px;right:18px;z-index:99999;display:flex;gap:8px;background:#151517;padding:9px;border:1px solid #ffc21a;border-radius:12px;box-shadow:0 8px 30px #0006;font:700 12px Arial'>"+
-   "<a href='/admin/home' style='background:#ffc21a;color:#111;padding:11px;border-radius:8px;text-decoration:none'>Admin da Home</a>"+
-   "<a href='/admin/portal' style='background:#29292e;color:#fff;padding:11px;border-radius:8px;text-decoration:none'>Admin do Portal</a></nav>";
-  page=page.replace("</body>",navigation+"</body>");
-  return ResponseEntity.ok().contentType(MediaType.parseMediaType("text/html;charset=UTF-8")).body(page.getBytes(java.nio.charset.StandardCharsets.UTF_8));
- }
+ @GetMapping("/home")
+ public String home(){return "redirect:/admin/portal#home";}
  private String done(RedirectAttributes redirect,String message,String anchor){
   redirect.addFlashAttribute("sucesso",message);return "redirect:/admin/portal#"+anchor;
  }
