@@ -21,6 +21,7 @@ public class SecurityConfig {
   return http.authorizeHttpRequests(auth -> auth
       .requestMatchers("/portal/**").authenticated()
       .requestMatchers("/admin-v4.html").denyAll()
+      .requestMatchers("/admin/home","/admin/portal").hasRole("ADMIN")
       .requestMatchers("/admin/**","/admin").hasRole("ADMIN")
       .anyRequest().permitAll())
     .formLogin(form -> form.loginPage("/login").loginProcessingUrl("/login").defaultSuccessUrl("/portal",false).permitAll())
