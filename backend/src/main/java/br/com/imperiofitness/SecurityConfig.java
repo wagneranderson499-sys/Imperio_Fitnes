@@ -20,7 +20,8 @@ public class SecurityConfig {
  @Bean SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
   return http.authorizeHttpRequests(auth -> auth
       .requestMatchers("/portal/**").authenticated()
-      .requestMatchers("/admin/**","/admin","/admin-v4.html").denyAll()
+      .requestMatchers("/admin-v4.html").denyAll()
+      .requestMatchers("/admin/**","/admin").hasRole("ADMIN")
       .anyRequest().permitAll())
     .formLogin(form -> form.loginPage("/login").loginProcessingUrl("/login").defaultSuccessUrl("/portal",false).permitAll())
     .logout(logout -> logout.logoutSuccessUrl("/"))
