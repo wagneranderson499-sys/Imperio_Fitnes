@@ -1,6 +1,13 @@
 package br.com.imperiofitness;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,7 +39,7 @@ public class PortalController {
  @PostMapping("/cadastro")
  public String cadastrar(@RequestParam String nome,@RequestParam String email,@RequestParam String senha,
                          @RequestParam String dataNascimento,@RequestParam String celular,
-                         @RequestParam(defaultValue="") String plano,RedirectAttributes redirect){
+                         @RequestParam(defaultValue="") String plano,RedirectAttributes redirect,HttpServletRequest request,HttpServletResponse response){
   nome=nome.trim().replaceAll("\\s+"," ");email=email.trim().toLowerCase(Locale.ROOT);
   String digitos=celular.replaceAll("\\D","");
   LocalDate nascimento;
@@ -53,9 +60,16 @@ public class PortalController {
    redirect.addFlashAttribute("erro","E-mail já cadastrado. Entre na sua conta.");
    return "redirect:/cadastro?modo=login"+planoQuery(plano);
   }
-  alunos.save(new Aluno(nome,email,encoder.encode(senha),nascimento,digitos));
-  redirect.addFlashAttribute("sucesso","Conta criada! Entre para continuar sua matrícula.");
-  return "redirect:/cadastro?modo=login"+planoQuery(plano);
+  Aluno novoAluno=alunos.save(new Aluno(nome,email,encoder.encode(senha),nascimento,digitos));
+  request.changeSessionId();
+  var auth=new UsernamePasswordAuthenticationToken(novoAluno.email,null,java.util.List.of(new SimpleGrantedAuthority("ROLE_CLIENTE")));
+  var context=SecurityContextHolder.createEmptyContext();
+  context.setAuthentication(auth);
+  SecurityContextHolder.setContext(context);
+  SecurityContextRepository contextRepository=new HttpSessionSecurityContextRepository();
+  contextRepository.saveContext(context,request,response);
+  if(!plano.isBlank())request.getSession().setAttribute("planoEscolhido",plano);
+  return "redirect:/portal?welcome=1";
  }
  @GetMapping("/login")
  public String login(@RequestParam(defaultValue="") String plano,@RequestParam(required=false) String error,Model model,HttpSession session){
