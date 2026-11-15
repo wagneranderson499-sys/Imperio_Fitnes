@@ -48,5 +48,5 @@ export default function App() {
     return () => { window.removeEventListener('storage', refresh); window.removeEventListener('imperio-home-updated', refresh); window.removeEventListener('popstate', pop) }
   }, [])
   const back = () => { window.history.pushState({}, '', '/'); setAdmin(false); setPublished(loadPublished()) }
-  return admin ? <AdminHome onBack={back} onPublished={() => setPublished(loadPublished())} /> : <Home data={published || defaultHome} />
+  return admin ? <iframe title="Painel Administrativo Império Fitness V4" src="/admin-v4.html" className="original-home-frame" /> : <Home data={published || defaultHome} />
 }
