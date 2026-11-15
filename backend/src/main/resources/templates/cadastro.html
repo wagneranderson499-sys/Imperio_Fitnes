@@ -1,1 +1,109 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cadastro | Império Fitness</title><script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script></head><body class="min-h-screen bg-zinc-950 text-white"><header class="border-b border-amber-500/30 p-5 flex justify-between"><a href="/" class="font-bold text-amber-400">IMPÉRIO FITNESS</a><span class="text-zinc-400">Portal do Cliente</span></header><main class="max-w-xl mx-auto p-6"><div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-7 mt-10"><h1 class="text-3xl font-bold mb-2">Criar conta</h1><p class="text-zinc-400 mb-6">Cadastre-se para solicitar sua matrícula.</p><p th:if="${erro}" th:text="${erro}" class="text-red-400 mb-4"></p><form method="post" action="/cadastro" class="space-y-4"><input type="hidden" name="_csrf" th:value="${_csrf.token}"><input type="hidden" name="plano" th:value="${plano}"><label class="block">Nome completo<input required name="nome" class="w-full mt-2 p-3 rounded bg-zinc-800"></label><label class="block">E-mail<input required type="email" name="email" class="w-full mt-2 p-3 rounded bg-zinc-800"></label><label class="block">Senha (mínimo 8 caracteres)<input required minlength="8" type="password" name="senha" class="w-full mt-2 p-3 rounded bg-zinc-800"></label><button class="w-full bg-amber-500 text-black font-bold p-3 rounded">Criar conta</button></form><p class="mt-5 text-zinc-400">Já tem conta? <a th:href="@{/login(plano=${plano})}" class="text-amber-400">Entrar</a></p></div></main></body></html>
+<!doctype html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+ <meta name="theme-color" content="#09090b">
+ <title>Portal do Cliente | Império Fitness</title>
+ <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+ <style>
+ :root{color-scheme:dark;--gold:#ffc21a;--bg:#08090b;--panel:#151517;--border:#333337}
+ body{font-family:'DM Sans',Arial,sans-serif;background:var(--bg)}
+ h1,h2,.display-font{font-family:'Barlow Condensed',Impact,sans-serif}
+ .auth-field{display:block;width:100%;border:1px solid #3f3f46;border-radius:12px;background:#1d1d20;padding:13px 15px;color:#fff;outline:none;transition:border-color .2s,box-shadow .2s}
+ .auth-field:focus{border-color:var(--gold);box-shadow:0 0 0 3px #ffc21a20}
+ .auth-field::placeholder{color:#77777d}
+ .tab[aria-selected="true"]{color:var(--gold);border-color:var(--gold);background:#ffc21a0c}
+ .tab[aria-selected="false"]{color:#a1a1aa;border-color:transparent}
+ .gold-button{background:var(--gold);color:#101010;transition:background .2s,transform .2s}
+ .gold-button:hover{background:#f5d26b;transform:translateY(-1px)}
+ .auth-panel{background:linear-gradient(155deg,#1b1b1e,#111113)}
+ .pattern{background-image:radial-gradient(circle at 85% 15%,#ffc21a28,transparent 38%),linear-gradient(140deg,#161616,#090909)}
+ </style>
+</head>
+<body class="min-h-screen text-zinc-100">
+ <header class="border-b border-white/10">
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 h-20 flex items-center justify-between gap-4">
+   <a href="/" class="display-font text-2xl sm:text-3xl font-black tracking-wide text-amber-400">IMPÉRIO <span class="text-white">FITNESS</span></a>
+   <a href="/" class="text-sm text-zinc-300 hover:text-amber-400 transition">← Voltar para a Home</a>
+  </div>
+ </header>
+ <main class="max-w-7xl mx-auto px-4 sm:px-8 py-9 lg:py-16">
+  <div class="grid lg:grid-cols-[.92fr_1fr] rounded-3xl overflow-hidden border border-zinc-800 shadow-2xl shadow-black/40">
+   <aside class="pattern hidden lg:flex flex-col justify-between p-12 xl:p-16 border-r border-zinc-800 min-h-[690px]">
+    <div><span class="inline-flex items-center rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-xs tracking-[.2em] text-amber-300 font-bold">PORTAL DO CLIENTE</span>
+     <h1 class="mt-10 text-6xl xl:text-7xl font-black uppercase leading-[.96]">Seu próximo<br>nível começa<br><span class="text-amber-400">aqui.</span></h1>
+     <p class="mt-7 text-zinc-400 max-w-sm leading-7">Faça parte da Império Fitness. Crie sua conta, escolha seu plano e acompanhe sua solicitação de matrícula em um só lugar.</p>
+    </div>
+    <div class="border-t border-white/10 pt-7 flex items-center gap-4"><span class="w-12 h-12 rounded-xl bg-amber-400/10 border border-amber-400/20 grid place-items-center text-amber-400 text-2xl">★</span><div><strong class="block">Sua evolução começa agora</strong><span class="text-sm text-zinc-400">Treine com foco. Conquiste seu império.</span></div></div>
+   </aside>
+   <section class="auth-panel p-5 sm:p-9 xl:p-12">
+    <div class="max-w-xl mx-auto">
+     <div class="lg:hidden mb-8"><p class="text-xs uppercase tracking-[.2em] text-amber-400 font-bold">Portal do Cliente</p><h1 class="text-4xl font-black mt-2 uppercase">Seu próximo nível começa aqui.</h1></div>
+     <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-zinc-950/70 border border-zinc-800 mb-8" role="tablist" aria-label="Acesso à conta">
+      <button id="tab-cadastro" class="tab rounded-lg py-3 font-bold text-sm border" type="button" role="tab" aria-controls="painel-cadastro" onclick="switchMode('cadastro')">Criar conta</button>
+      <button id="tab-login" class="tab rounded-lg py-3 font-bold text-sm border" type="button" role="tab" aria-controls="painel-login" onclick="switchMode('login')">Entrar</button>
+     </div>
+     <div th:if="${erro}" role="alert" class="mb-5 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200" th:text="${erro}"></div>
+     <div th:if="${sucesso}" role="status" class="mb-5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200" th:text="${sucesso}"></div>
+     <div th:if="${param.error}" role="alert" class="mb-5 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">E-mail ou senha inválidos. Tente novamente.</div>
+     <div id="painel-cadastro" role="tabpanel" aria-labelledby="tab-cadastro">
+      <h2 class="text-4xl sm:text-5xl font-black uppercase">Crie sua <span class="text-amber-400">conta.</span></h2>
+      <p class="text-zinc-400 mt-2 mb-7 text-sm leading-6">Preencha seus dados para iniciar sua matrícula.</p>
+      <form method="post" action="/cadastro" class="space-y-4" id="form-cadastro">
+       <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+       <input type="hidden" name="plano" th:value="${plano}">
+       <div><label for="nome" class="block text-sm font-semibold mb-2">Nome completo</label><input class="auth-field" id="nome" name="nome" type="text" autocomplete="name" minlength="3" maxlength="150" required placeholder="Seu nome e sobrenome"></div>
+       <div><label for="email" class="block text-sm font-semibold mb-2">E-mail</label><input class="auth-field" id="email" name="email" type="email" autocomplete="email" maxlength="254" required placeholder="seuemail@exemplo.com"></div>
+       <div class="grid sm:grid-cols-2 gap-4">
+        <div><label for="dataNascimento" class="block text-sm font-semibold mb-2">Data de nascimento</label><input class="auth-field" id="dataNascimento" name="dataNascimento" type="date" autocomplete="bday" required></div>
+        <div><label for="celular" class="block text-sm font-semibold mb-2">Celular com DDD</label><input class="auth-field" id="celular" name="celular" type="tel" autocomplete="tel" inputmode="tel" maxlength="20" required placeholder="(91) 99999-9999"></div>
+       </div>
+       <div><label for="senha" class="block text-sm font-semibold mb-2">Senha segura</label>
+        <div class="relative"><input class="auth-field pr-20" id="senha" name="senha" type="password" autocomplete="new-password" minlength="10" maxlength="72" required placeholder="Crie uma senha forte"><button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-amber-400 hover:text-amber-200" onclick="togglePassword('senha',this)" aria-label="Mostrar senha">Mostrar</button></div>
+        <p class="mt-2 text-xs leading-5 text-zinc-400">Mínimo de 10 caracteres, com maiúscula, minúscula, número e símbolo.</p>
+       </div>
+       <button type="submit" class="gold-button w-full rounded-xl py-4 font-extrabold mt-2">CRIAR MINHA CONTA →</button>
+      </form>
+     </div>
+     <div id="painel-login" role="tabpanel" aria-labelledby="tab-login" hidden>
+      <h2 class="text-4xl sm:text-5xl font-black uppercase">Bem-vindo <span class="text-amber-400">de volta.</span></h2>
+      <p class="text-zinc-400 mt-2 mb-7 text-sm">Acesse sua conta para acompanhar sua matrícula.</p>
+      <form method="post" action="/login" class="space-y-5">
+       <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+       <div><label for="login-email" class="block text-sm font-semibold mb-2">E-mail</label><input class="auth-field" id="login-email" name="username" type="email" autocomplete="username" required placeholder="seuemail@exemplo.com"></div>
+       <div><label for="login-senha" class="block text-sm font-semibold mb-2">Senha</label><div class="relative"><input class="auth-field pr-20" id="login-senha" name="password" type="password" autocomplete="current-password" required placeholder="Sua senha"><button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-amber-400 hover:text-amber-200" onclick="togglePassword('login-senha',this)" aria-label="Mostrar senha">Mostrar</button></div></div>
+       <button type="submit" class="gold-button w-full rounded-xl py-4 font-extrabold">ENTRAR NA MINHA CONTA →</button>
+      </form>
+     </div>
+     <p class="mt-8 text-center text-xs text-zinc-500">Seus dados são utilizados para o cadastro e gerenciamento da sua matrícula.</p>
+    </div>
+   </section>
+  </div>
+ </main>
+ <script th:inline="javascript">
+  const initialMode = /*[[${modo}]]*/ 'cadastro';
+  function switchMode(mode){
+   const login=mode==='login';
+   document.getElementById('painel-cadastro').hidden=login;
+   document.getElementById('painel-login').hidden=!login;
+   document.getElementById('tab-cadastro').setAttribute('aria-selected',String(!login));
+   document.getElementById('tab-login').setAttribute('aria-selected',String(login));
+  }
+  function togglePassword(id,button){const el=document.getElementById(id);const visible=el.type==='password';el.type=visible?'text':'password';button.textContent=visible?'Ocultar':'Mostrar';button.setAttribute('aria-label',visible?'Ocultar senha':'Mostrar senha')}
+  document.getElementById('form-cadastro').addEventListener('submit',function(event){
+   const name=document.getElementById('nome'),pass=document.getElementById('senha'),phone=document.getElementById('celular'),birth=document.getElementById('dataNascimento');
+   if(!name.value.trim().includes(' ')){name.setCustomValidity('Informe nome e sobrenome.')}else{name.setCustomValidity('')}
+   const strong=pass.value.length>=10 && /[A-ZÀ-Ý]/.test(pass.value) && /[a-zà-ÿ]/.test(pass.value) && /[0-9]/.test(pass.value) && /[^\p{L}\d\s]/u.test(pass.value);
+   pass.setCustomValidity(strong?'':'Use 10 caracteres ou mais, com maiúscula, minúscula, número e símbolo.');
+   const digits=phone.value.replace(/\D/g,'');phone.setCustomValidity(digits.length===10||digits.length===11?'':'Informe celular com DDD (10 ou 11 dígitos).');
+   const today=new Date().toISOString().slice(0,10);birth.setCustomValidity(birth.value && birth.value>=today?'Informe uma data anterior a hoje.':'');
+   if(!this.checkValidity()){event.preventDefault();this.reportValidity()}
+  });
+  ['nome','senha','celular','dataNascimento'].forEach(id=>document.getElementById(id).addEventListener('input',e=>e.target.setCustomValidity('')));
+  switchMode(initialMode);
+ </script>
+</body>
+</html>
