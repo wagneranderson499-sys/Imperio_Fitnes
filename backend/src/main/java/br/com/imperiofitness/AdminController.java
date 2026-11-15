@@ -36,6 +36,7 @@ public class AdminController {
   model.addAttribute("alunos",lista);
   model.addAttribute("modelos",modelos.findAll());
   model.addAttribute("notificacoes",notificacoes.findAll());
+  model.addAttribute("pagamentos",pagamentos.findAll());
   model.addAttribute("totalPendentes",pedidos.stream().filter(m->"PENDENTE".equals(m.status)).count());
   model.addAttribute("totalAtivos",lista.stream().filter(a->"ATIVO".equals(a.situacaoPlano)).count());
   model.addAttribute("totalFacial",lista.stream().filter(a->!"CONCLUIDO".equals(a.cadastroFacial)).count());
