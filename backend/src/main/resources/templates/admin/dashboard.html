@@ -1,88 +1,83 @@
-<!doctype html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Gestão de Alunos | Império Fitness</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{color-scheme:dark;--bg:#09090b;--panel:#18181b;--border:#34343a;--gold:#ffc21a;--muted:#aaaab2;--text:#f8f8f8}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif}
-a{color:inherit;text-decoration:none}button,input,select{font:inherit}button{cursor:pointer}
-.layout{display:grid;grid-template-columns:265px minmax(0,1fr);min-height:100vh}
-aside{background:#111113;border-right:1px solid var(--border);padding:28px 19px;position:sticky;top:0;height:100vh}
-.brand{display:flex;gap:12px;align-items:center;border-bottom:1px solid var(--border);padding-bottom:25px}
-.brandmark{display:grid;place-items:center;border:2px solid var(--gold);color:var(--gold);border-radius:50%;height:47px;width:47px;font-weight:900;font-size:24px}
-.brand strong{font:900 25px 'Barlow Condensed',sans-serif;letter-spacing:1px}.brand small{display:block;font-size:10px;letter-spacing:2px;color:var(--gold)}
-nav{margin-top:28px;display:grid;gap:7px}nav a{padding:13px 15px;border-radius:10px;color:#bcbcc4;font-size:13px;font-weight:700}
-nav a:hover,nav a.active{background:#302917;color:var(--gold)}.logout{margin-top:30px}
-.logout button{width:100%;background:transparent;border:1px solid var(--border);border-radius:10px;color:#ddd;padding:12px}
-main{padding:32px clamp(18px,4vw,62px);min-width:0;max-width:1600px;width:100%;margin:auto}
-.eyebrow{font-size:11px;letter-spacing:3px;color:var(--gold);font-weight:800}
-h1,h2,h3{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;line-height:1}
-h1{font-size:clamp(38px,5vw,58px);margin:9px 0 12px}h2{font-size:31px;margin:0 0 17px}
-p{color:var(--muted);line-height:1.65}.heading{margin-bottom:32px}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.stat,.panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px}
-.stat strong{display:block;font:800 43px 'Barlow Condensed',sans-serif;color:var(--gold);margin-top:10px}.stat span{color:var(--muted);font-size:13px}
-section{margin-top:37px;scroll-margin-top:20px}.panel{margin-top:15px}
-.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:700px;text-align:left}
-th{color:var(--gold);font-size:11px;letter-spacing:1px;text-transform:uppercase}
-td,th{padding:14px 10px;border-bottom:1px solid #303034;font-size:13px}td{color:#ddd}
-td small{display:block;color:var(--muted);margin-top:4px}.status{display:inline-block;padding:6px 10px;border-radius:8px;background:#3b311a;color:#ffd46a;font-size:11px;font-weight:800}
-.status.aprovada{background:#173b2c;color:#8be7b8}.status.recusada,.status.cancelada{background:#431e24;color:#ffb3bd}
-.formrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-select{background:#25252a;color:#fff;border:1px solid #505057;border-radius:8px;padding:9px;max-width:150px}
-button.primary{background:var(--gold);color:#111;border:0;border-radius:8px;padding:10px 13px;font-weight:800}
-.notice{padding:15px 18px;border:1px solid #6a5320;border-radius:10px;background:#292315;color:#ffe0a2}
-.placeholder{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.placeholder article{background:#18181b;border:1px solid var(--border);border-radius:14px;padding:21px}
-.placeholder h3{font-size:23px;margin:0}.placeholder p{font-size:13px;margin-bottom:0}
-footer{padding:35px 0;color:var(--muted);font-size:12px}
-@media(max-width:900px){.layout{display:block}aside{position:relative;height:auto;padding:18px}nav{display:flex;overflow:auto;margin-top:15px}nav a{white-space:nowrap}.logout{margin-top:10px}.brand{padding-bottom:12px}main{padding:22px 16px}.stats{grid-template-columns:1fr}.placeholder{grid-template-columns:1fr}}
-</style>
-</head><body><div class="layout">
-<aside><div class="brand"><div class="brandmark">IF</div><div><strong>IMPÉRIO FITNESS</strong><small>GESTÃO DE ALUNOS</small></div></div>
-<nav aria-label="Menu administrativo">
-<a href="#resumo" class="active">Visão geral</a>
-<a href="#alunos">Alunos cadastrados</a>
-<a href="#matriculas">Matrículas e planos</a>
-<a href="#proximas">Treinos e demais módulos</a>
-<a href="/">Visualizar Home</a>
-</nav>
-<form class="logout" method="post" action="/logout"><input type="hidden" name="_csrf" th:value="${_csrf.token}"><button type="submit">Sair da conta</button></form>
-</aside>
-<main><div class="heading" id="resumo"><div class="eyebrow">ADMINISTRAÇÃO · PORTAL DO ALUNO</div><h1>Gestão de alunos</h1><p>Dados reais do cadastro e das solicitações de matrícula, sincronizados com o Portal do Aluno.</p></div>
-<div th:if="${sucesso}" class="notice" role="status" th:text="${sucesso}">Atualização realizada.</div>
-<div th:if="${erro}" class="notice" role="alert" th:text="${erro}">Não foi possível atualizar.</div>
+<!doctype html><html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin do Portal | Império Fitness</title><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"><style>
+:root{--bg:#f3f5f8;--white:#fff;--ink:#182335;--muted:#747d8c;--line:#e1e7ee;--gold:#ffc21a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px 'DM Sans',Arial,sans-serif}h1,h2,h3{font-family:'Barlow Condensed',Impact,sans-serif;text-transform:uppercase;margin:0 0 15px}h1{font-size:37px}h2{font-size:28px}h3{font-size:26px}p{color:var(--muted);line-height:1.55;margin:7px 0 18px}a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}button{cursor:pointer}
+.layout{display:grid;grid-template-columns:255px minmax(0,1fr);min-height:100vh}.sidebar{background:#111419;color:white;padding:24px 15px;position:sticky;top:0;height:100vh;overflow-y:auto}.brand{padding:10px 12px 22px;border-bottom:1px solid #30343b;font:900 27px 'Barlow Condensed',sans-serif;letter-spacing:.8px}.brand b{color:var(--gold)}.brand small{display:block;font:700 10px 'DM Sans',sans-serif;letter-spacing:2px;color:#b5b7c0;margin-top:7px}
+.nav{display:block;padding:12px 14px;border-radius:10px;color:#d3d5d9;margin:6px 0;font-weight:700;font-size:12px}.nav:hover,.nav.active{background:#353022;color:#ffd264}.sidebar-label{font-size:10px;letter-spacing:2px;color:#999;margin:24px 14px 12px}.logout{width:100%;background:transparent;border:1px solid #41434a;color:#eee;padding:11px;border-radius:9px;margin-top:24px}
+main{padding:20px clamp(16px,3vw,48px) 65px;min-width:0;max-width:1550px;width:100%;margin:auto}.section{display:none;scroll-margin-top:20px}.section.active{display:block}
+.heading{background:white;border:1px solid var(--line);padding:23px 25px;border-radius:18px;margin-bottom:24px;box-shadow:0 6px 18px #192b4210}.heading h1{margin-bottom:8px}.toplinks{display:flex;gap:10px;flex-wrap:wrap}.toplinks a{border:1px solid #d3dfe9;border-radius:10px;padding:10px 14px;font-weight:800;font-size:12px}.toplinks a.current{background:#ffc21a;border-color:#ffc21a;color:#161616}
+.card{background:white;border:1px solid var(--line);border-radius:17px;padding:22px;margin:18px 0;box-shadow:0 7px 18px #15263a09}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px}.stat small{display:block;color:var(--muted)}.stat strong{display:block;font-size:24px;margin-top:9px}.quick{display:flex;gap:9px;flex-wrap:wrap}
+.btn{border:1px solid #d4dfe9;border-radius:9px;padding:11px 14px;background:white;color:#1d2b3e;font-weight:800;font-size:12px}.btn:hover{border-color:#ffc21a}.btn.primary{background:var(--gold);border-color:#e6aa00;color:#111}.btn.danger{color:#c32c40;border-color:#ffced5;background:#fff4f5}.btn.small{padding:8px 11px}
+.field{display:flex;flex-direction:column;gap:7px}.field label{font-size:12px;font-weight:800;color:#536071}.field input,.field select,.field textarea{width:100%;padding:12px 13px;border:1px solid #d9e0e8;border-radius:10px;background:#fff;color:#1d2939;min-height:45px}.field textarea{min-height:110px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid #ffcc36;outline-offset:1px}.field.full{grid-column:1/-1}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:17px}
+.item{display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid #e8edf2;padding:15px 0}.item:last-child{border:0}.item strong{display:block}.item small{display:block;color:#7c8592;margin-top:5px}.item-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.pill{background:#e6f6ec;color:#248354;border-radius:30px;padding:7px 11px;font-size:11px;font-weight:800}.pill.warn{background:#fff1c7;color:#986a06}.pill.bad{background:#ffe9ec;color:#b43b4e}
+.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:730px}th{text-align:left;font-size:11px;color:#788394;text-transform:uppercase;letter-spacing:.7px}td,th{padding:13px 10px;border-bottom:1px solid #e9edf2;vertical-align:middle}td{font-size:12px}td form{display:flex;align-items:center;gap:7px}td select{border:1px solid #d9e0e8;border-radius:8px;padding:8px;background:white;max-width:160px}
+.alert{padding:13px 16px;border-radius:10px;background:#fff6db;border:1px solid #f0d89c;color:#71531b;margin:15px 0}.note{padding:13px 15px;border:1px solid #f4dfaa;border-radius:10px;background:#fff9eb;color:#916d21;font-size:12px;line-height:1.5}.muted{color:#788394;font-size:12px}.hidden{display:none!important}.modal{border:0;border-radius:18px;padding:26px;max-width:570px;width:calc(100% - 30px);box-shadow:0 30px 100px #0005}.modal::backdrop{background:#0c1524a8}
+@media(max-width:900px){.layout{display:block}.sidebar{position:relative;height:auto;padding:12px}.brand{padding:8px 12px}.sidebar-label{margin:12px}.menu{display:flex;overflow-x:auto;gap:6px}.nav{white-space:nowrap}.logout{margin:7px 0}.grid,.stats{grid-template-columns:1fr}main{padding:16px}.item{align-items:flex-start;flex-direction:column}}
+</style></head><body><div class="layout">
+<aside class="sidebar"><div class="brand">IMPÉRIO <b>FITNESS</b><small>PAINEL ADMINISTRATIVO</small></div><div class="sidebar-label">ÁREAS DO ADMIN</div><div class="menu"><a class="nav" href="/admin/home">Admin da Home</a><a class="nav active" href="/admin/portal">Admin do Portal</a></div><div class="sidebar-label">PORTAL DO ALUNO</div><div class="menu">
+<a class="nav" href="#visao" data-section="visao">Visão geral dos alunos</a>
+<a class="nav" href="#cadastrar" data-section="cadastrar">Cadastrar aluno</a>
+<a class="nav" href="#treinos" data-section="treinos">Gestão de treinos</a>
+<a class="nav" href="#planos" data-section="planos">Planos e mensalidades</a>
+<a class="nav" href="#notificacoes" data-section="notificacoes">Notificações dos alunos</a></div>
+<form method="post" action="/logout"><input type="hidden" name="_csrf" th:value="${_csrf.token}"><button class="logout" type="submit">Sair da conta</button></form>
+</aside><main>
+<div class="toplinks" style="margin-bottom:16px"><a href="/admin/home">Admin da Home</a><a href="/admin/portal" class="current">Admin do Portal</a></div>
+<div th:if="${sucesso}" class="alert" th:text="${sucesso}"></div><div th:if="${erro}" class="alert" th:text="${erro}"></div>
+<div th:if="${linkAtivacao}" class="alert">Link de ativação do aluno (válido por 48 horas): <a style="text-decoration:underline;overflow-wrap:anywhere" th:href="${linkAtivacao}" th:text="${linkAtivacao}"></a>. Entregue apenas ao aluno responsável.</div>
+
+<section id="visao" class="section active"><div class="heading"><h1>VISÃO GERAL DOS ALUNOS</h1><p>Dados sincronizados com o banco de dados. As alterações operacionais são salvas imediatamente.</p></div>
+<h2>PAINEL ADMIN DO ALUNO</h2><p>Gerencie a jornada do aluno, do cadastro à evolução dos treinos.</p>
 <div class="stats">
-<div class="stat"><span>Alunos cadastrados</span><strong th:text="${#lists.size(alunos)}">0</strong></div>
-<div class="stat"><span>Matrículas pendentes</span><strong th:text="${totalPendentes}">0</strong></div>
-<div class="stat"><span>Matrículas aprovadas</span><strong th:text="${totalAprovadas}">0</strong></div>
-</div>
-<section id="alunos"><h2>Alunos cadastrados</h2><div class="panel tablewrap"><table><thead><tr><th>Nome</th><th>E-mail</th><th>Celular</th><th>Data de nascimento</th></tr></thead>
-<tbody><tr th:each="a : ${alunos}"><td th:text="${a.nome}">Nome</td><td th:text="${a.email}">E-mail</td><td th:text="${a.celular}">Celular</td><td th:text="${a.dataNascimento}">Nascimento</td></tr></tbody></table>
-<p th:if="${#lists.isEmpty(alunos)}">Nenhum aluno cadastrado.</p></div></section>
-<section id="matriculas"><h2>Matrículas e planos</h2><p>O status atualizado aqui é salvo no banco de dados e pode ser consultado pelo Portal do Aluno.</p>
-<div class="panel tablewrap"><table><thead><tr><th>Aluno</th><th>Plano solicitado</th><th>Situação</th><th>Data</th><th>Gerenciar</th></tr></thead>
-<tbody><tr th:each="m : ${matriculas}"><td><strong th:text="${m.aluno.nome}">Aluno</strong><small th:text="${m.aluno.email}">E-mail</small></td><td th:text="${m.plano}">Plano</td>
-<td><span class="status" th:classappend="${#strings.toLowerCase(m.status)}" th:text="${m.status}">PENDENTE</span></td>
-<td th:text="${#temporals.format(m.criadaEm,'dd/MM/yyyy HH:mm')}">Data</td>
-<td><form class="formrow" th:action="@{/admin/matriculas/{id}/status(id=${m.id})}" method="post">
-<input type="hidden" name="_csrf" th:value="${_csrf.token}">
-<select name="status" th:attr="aria-label=|Alterar status da matrícula de ${m.aluno.nome}|" required>
-<option value="PENDENTE" th:selected="${m.status == 'PENDENTE'}">Pendente</option>
-<option value="APROVADA" th:selected="${m.status == 'APROVADA'}">Aprovada</option>
-<option value="RECUSADA" th:selected="${m.status == 'RECUSADA'}">Recusada</option>
-<option value="CANCELADA" th:selected="${m.status == 'CANCELADA'}">Cancelada</option>
-</select><button class="primary" type="submit">Salvar</button></form></td></tr></tbody></table>
-<p th:if="${#lists.isEmpty(matriculas)}">Nenhuma solicitação de matrícula recebida.</p></div></section>
-<section id="proximas"><h2>Próximos módulos de integração</h2><p>O arquivo de referência inclui estas áreas, mas elas ainda precisam de modelos e regras reais no Spring Boot. Não são apresentados dados fictícios como se fossem registros dos alunos.</p>
-<div class="placeholder">
-<article><h3>Treinos e biblioteca</h3><p>Cadastrar exercícios, criar fichas e atribuir treinos individualmente.</p></article>
-<article><h3>Frequência e catraca</h3><p>Registrar acessos verificados e acompanhar o histórico de cada aluno.</p></article>
-<article><h3>Mensalidades</h3><p>Gerenciar vencimentos e comprovantes sem simular cobranças reais.</p></article>
-<article><h3>Solicitações e notificações</h3><p>Receber pedidos dos alunos e configurar mensagens por categoria.</p></article>
-</div></section>
-<footer>Império Fitness · Administração de alunos · Área restrita</footer>
-</main></div></body></html>
+<div class="stat"><small>Alunos cadastrados</small><strong th:text="${#lists.size(alunos)}">0</strong></div>
+<div class="stat"><small>Planos ativos</small><strong th:text="${totalAtivos}">0</strong></div>
+<div class="stat"><small>Facial pendente</small><strong th:text="${totalFacial}">0</strong></div>
+<div class="stat"><small>Solicitações em análise</small><strong th:text="${totalPendentes}">0</strong></div></div>
+<div class="card"><h2>ACESSOS RÁPIDOS</h2><div class="quick"><button class="btn primary" onclick="showSection('cadastrar')">+ Cadastrar aluno</button><button class="btn" onclick="showSection('treinos')">Gerenciar treinos</button><button class="btn" onclick="showSection('planos')">Planos e mensalidades</button><button class="btn" onclick="showSection('notificacoes')">Notificações</button></div></div>
+<div class="card"><h2>ALUNOS CADASTRADOS</h2><p>Clique no aluno para consultar seus dados, plano e situação.</p><div th:each="a : ${alunos}" class="item"><div><strong th:text="${a.nome}">Aluno</strong><small th:text="${a.email}">E-mail</small></div><button type="button" class="btn" th:attr="data-nome=${a.nome},data-email=${a.email},data-celular=${a.celular},data-nascimento=${a.dataNascimento},data-plano=${a.planoAtual},data-situacao=${a.situacaoPlano},data-facial=${a.cadastroFacial},data-vencimento=${a.vencimentoPlano}" onclick="openAluno(this)">Ver detalhes</button></div><p th:if="${#lists.isEmpty(alunos)}">Nenhum aluno cadastrado.</p></div>
+<div class="card"><h2>SOLICITAÇÕES DE MATRÍCULA</h2><div class="tablewrap"><table><thead><tr><th>Aluno</th><th>Plano</th><th>Data</th><th>Situação</th><th>Ação</th></tr></thead><tbody><tr th:each="m : ${matriculas}"><td th:text="${m.aluno.nome}">Aluno</td><td th:text="${m.plano}">Plano</td><td th:text="${#temporals.format(m.criadaEm,'dd/MM/yyyy')}">Data</td><td th:text="${m.status}">PENDENTE</td><td><form th:action="@{/admin/matriculas/{id}/status(id=${m.id})}" method="post"><input type="hidden" name="_csrf" th:value="${_csrf.token}"><select name="status"><option th:each="st : ${{'PENDENTE','APROVADA','RECUSADA','CANCELADA'}}" th:value="${st}" th:text="${st}" th:selected="${m.status == st}"></option></select><button class="btn small primary" type="submit">Salvar</button></form></td></tr></tbody></table></div></div>
+</section>
+
+<section id="cadastrar" class="section"><div class="heading"><h1>CADASTRAR ALUNO</h1><p>A recepção cadastra o aluno, define seu plano e entrega um convite para ele criar a própria senha.</p></div>
+<div class="card"><h2>NOVO ALUNO</h2><form action="/admin/alunos" method="post"><input type="hidden" name="_csrf" th:value="${_csrf.token}"><div class="grid">
+<div class="field"><label>Nome completo *</label><input name="nome" required minlength="3" maxlength="150" placeholder="Nome do aluno"></div>
+<div class="field"><label>E-mail *</label><input name="email" type="email" required placeholder="aluno@exemplo.com"></div>
+<div class="field"><label>Celular / WhatsApp *</label><input name="celular" required placeholder="(91) 99999-9999"></div>
+<div class="field"><label>Data de nascimento *</label><input name="dataNascimento" type="date" required></div>
+<div class="field"><label>Plano contratado</label><select name="plano"><option value="3 acessos por semana">3 acessos por semana</option><option value="2 acessos por semana">2 acessos por semana</option><option value="Acesso livre">Acesso livre</option></select></div>
+<div class="field"><label>Situação inicial</label><select name="situacao"><option value="AGUARDANDO">Aguardando ativação/pagamento</option><option value="ATIVO">Ativo</option><option value="SUSPENSO">Suspenso</option><option value="VENCIDO">Vencido</option></select></div>
+<div class="field"><label>Cadastro facial</label><select name="facial"><option value="PELO_APLICATIVO">Pelo aplicativo</option><option value="PENDENTE">Pendente</option><option value="CONCLUIDO">Concluído</option></select></div>
+<div class="field"><label>Modelo de treino inicial</label><select name="modeloId"><option value="">Selecionar depois</option><option th:each="m : ${modelos}" th:value="${m.id}" th:text="${m.nome}">Modelo</option></select></div></div><div class="actions"><button class="btn primary" type="submit">Cadastrar aluno</button><button class="btn" type="reset">Limpar campos</button></div></form><p class="muted">A senha nunca é definida pela recepção. O aluno recebe um link de ativação com validade de 48 horas.</p></div></section>
+
+<section id="treinos" class="section"><div class="heading"><h1>GESTÃO DE TREINOS</h1><p>Crie e renomeie modelos oficiais, defina exercícios e atribua fichas a cada aluno. Atribuições devem ser realizadas por profissional habilitado.</p></div>
+<div class="card"><h2>CRIAR MODELO DE TREINO</h2><form method="post" action="/admin/treinos/modelos" id="modeloForm"><input type="hidden" name="_csrf" th:value="${_csrf.token}"><input type="hidden" name="id" id="modeloId" disabled><div class="grid"><div class="field"><label>Nome do modelo *</label><input name="nome" id="modeloNome" maxlength="120" required placeholder="Ex.: ABC — Iniciante"></div><div class="field"><label>Divisão</label><select name="divisao" id="modeloDivisao"><option value="ABC">ABC</option><option value="AB">AB</option><option value="FUNCIONAL">Funcional</option><option value="OUTRO">Outro</option></select></div><div class="field full"><label>Exercícios do modelo (um por linha; exercício — séries x repetições)</label><textarea name="exercicios" id="modeloExercicios" required placeholder="Agachamento — 3 x 12&#10;Leg press — 3 x 12"></textarea></div></div><div class="actions"><button class="btn primary" id="modeloSubmit" type="submit">+ Salvar modelo</button><button class="btn" type="button" onclick="resetModelo()">Novo modelo</button></div></form></div>
+<div class="card"><h2>MODELOS DISPONÍVEIS PARA O ALUNO</h2><div th:each="m : ${modelos}" class="item"><div><strong th:text="${m.nome}">Modelo</strong><small th:text="${m.divisao}">Divisão</small></div><div class="item-actions"><button class="btn" type="button" th:attr="data-id=${m.id},data-nome=${m.nome},data-divisao=${m.divisao},data-exercicios=${m.exercicios}" onclick="editModelo(this)">Renomear</button><button class="btn" type="button" th:attr="data-id=${m.id},data-nome=${m.nome},data-divisao=${m.divisao},data-exercicios=${m.exercicios}" onclick="editModelo(this)">Editar exercícios</button><form method="post" th:action="@{/admin/treinos/modelos/{id}/excluir(id=${m.id})}" onsubmit="return confirm('Excluir este modelo? Treinos já atribuídos serão mantidos.')"><input type="hidden" name="_csrf" th:value="${_csrf.token}"><button class="btn danger" type="submit">Excluir</button></form></div></div><p th:if="${#lists.isEmpty(modelos)}">Nenhum modelo cadastrado.</p></div>
+<div class="card"><h2>ATRIBUIR TREINO A UM ALUNO</h2><form method="post" action="/admin/treinos/atribuir"><input type="hidden" name="_csrf" th:value="${_csrf.token}"><div class="grid"><div class="field"><label>Aluno</label><select name="alunoId" required><option value="">Selecione</option><option th:each="a : ${alunos}" th:value="${a.id}" th:text="${a.nome}">Aluno</option></select></div><div class="field"><label>Modelo</label><select name="modeloId" required><option value="">Selecione</option><option th:each="m : ${modelos}" th:value="${m.id}" th:text="${m.nome}">Modelo</option></select></div></div><div class="actions"><button class="btn primary" type="submit">Atribuir treino</button></div></form><p class="note">O aluno também poderá personalizar sua ficha pessoal. Treinos atribuídos oficialmente devem ser feitos por profissional habilitado.</p></div></section>
+
+<section id="planos" class="section"><div class="heading"><h1>PLANOS DOS ALUNOS</h1><p>Gerencie planos e mensalidades. Pagamentos recebidos em espécie podem ser registrados pela recepção.</p></div>
+<div class="card"><h2>SITUAÇÃO DOS ALUNOS</h2><div th:each="a : ${alunos}" class="item"><div><strong th:text="${a.nome}">Aluno</strong><small th:text="${a.planoAtual} ?: 'Sem plano'">Plano</small></div><div class="item-actions"><span class="pill" th:classappend="${a.situacaoPlano == 'ATIVO'} ? '' : 'warn'" th:text="${a.situacaoPlano}">Status</span><button class="btn" type="button" th:attr="data-id=${a.id},data-nome=${a.nome},data-plano=${a.planoAtual},data-situacao=${a.situacaoPlano},data-vencimento=${a.vencimentoPlano}" onclick="openPlano(this)">Alterar situação</button></div></div><p th:if="${#lists.isEmpty(alunos)}">Nenhum aluno cadastrado.</p></div>
+<div class="card"><h2>REGRAS DE ACESSO</h2><div class="note">Planos 2x e 3x: limites de acesso semanais conforme o contrato. Planos vencidos ou suspensos devem ser regularizados na recepção. A gestão de catraca não faz parte deste painel.</div></div></section>
+
+<section id="notificacoes" class="section"><div class="heading"><h1>NOTIFICAÇÕES DOS ALUNOS</h1><p>Personalize mensagens para todos os alunos, alunos ativos ou um aluno específico. Cada aluno pode ativar ou desativar todas as notificações em seu Perfil.</p></div>
+<div class="card"><h2>CRIAR NOVA NOTIFICAÇÃO</h2><form method="post" action="/admin/notificacoes"><input type="hidden" name="_csrf" th:value="${_csrf.token}"><div class="grid">
+<div class="field"><label>Título da notificação</label><input name="titulo" required maxlength="120" placeholder="Ex.: Horário especial de funcionamento"></div>
+<div class="field"><label>Categoria</label><select name="categoria"><option value="GERAL">Aviso geral</option><option value="TREINOS">Treinos</option><option value="MENSALIDADES">Mensalidades</option><option value="PROMOCOES">Promoções</option></select></div>
+<div class="field full"><label>Mensagem</label><textarea name="mensagem" required maxlength="2000" placeholder="Escreva a mensagem que os alunos receberão..."></textarea></div>
+<div class="field"><label>Destinatários</label><select name="destinatarios" id="destinatarios" onchange="document.getElementById('alunoDestino').classList.toggle('hidden',this.value!=='ALUNO')"><option value="TODOS">Todos os alunos</option><option value="ATIVOS">Somente alunos ativos</option><option value="ALUNO">Um aluno específico</option></select></div>
+<div class="field hidden" id="alunoDestino"><label>Aluno</label><select name="alunoId"><option value="">Selecione um aluno</option><option th:each="a : ${alunos}" th:value="${a.id}" th:text="${a.nome}">Aluno</option></select></div></div><div class="actions"><button class="btn primary" type="submit">Enviar notificação</button></div></form></div>
+<div class="card"><h2>HISTÓRICO DE NOTIFICAÇÕES</h2><div th:each="n : ${notificacoes}" class="item"><div><strong th:text="${n.titulo}">Título</strong><small th:text="${n.mensagem}">Mensagem</small></div><div><span class="pill warn" th:text="${n.destinatarios}">TODOS</span><small th:text="${#temporals.format(n.criadaEm,'dd/MM/yyyy HH:mm')}">Data</small></div></div><p th:if="${#lists.isEmpty(notificacoes)}">Nenhuma notificação enviada.</p></div></section>
+
+<dialog class="modal" id="alunoModal"><h2>DETALHES DO ALUNO</h2><div id="alunoDetalhes"></div><div class="actions"><button class="btn" onclick="document.getElementById('alunoModal').close()">Fechar</button></div></dialog>
+<dialog class="modal" id="planoModal"><h2 id="planoAlunoNome">ALTERAR PLANO</h2>
+<form method="post" id="planoForm"><input type="hidden" name="_csrf" th:value="${_csrf.token}"><div class="grid">
+<div class="field"><label>Plano contratado</label><select name="plano" id="planoNome"><option>3 acessos por semana</option><option>2 acessos por semana</option><option>Acesso livre</option></select></div>
+<div class="field"><label>Situação</label><select name="situacao" id="planoSituacao"><option value="AGUARDANDO">Aguardando pagamento</option><option value="ATIVO">Ativo</option><option value="VENCIDO">Vencido</option><option value="SUSPENSO">Suspenso</option><option value="CANCELADO">Cancelado</option></select></div>
+<div class="field"><label>Vencimento</label><input name="vencimento" id="planoVencimento" type="date"></div></div><div class="actions"><button class="btn primary" type="submit">Salvar situação</button></div></form>
+<h3 style="margin-top:24px">REGISTRAR PAGAMENTO</h3><form method="post" id="pagamentoForm"><input type="hidden" name="_csrf" th:value="${_csrf.token}"><div class="grid"><div class="field"><label>Valor recebido (R$)</label><input type="number" name="valor" min="0.01" max="100000" step="0.01" required></div><div class="field"><label>Forma</label><select name="forma"><option value="DINHEIRO">Dinheiro</option><option value="PIX">PIX</option><option value="CARTAO">Cartão</option><option value="TRANSFERENCIA">Transferência</option></select></div><div class="field"><label>Próximo vencimento</label><input name="vencimento" type="date" required></div></div><div class="actions"><button class="btn primary" type="submit">Confirmar pagamento e ativar</button><button type="button" class="btn" onclick="document.getElementById('planoModal').close()">Fechar</button></div></form></dialog>
+</main></div><script>
+function showSection(id){if(!document.getElementById(id))id='visao';document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));document.querySelectorAll('[data-section]').forEach(a=>a.classList.toggle('active',a.dataset.section===id));history.replaceState(null,'','#'+id);window.scrollTo({top:0,behavior:'instant'})}
+window.addEventListener('hashchange',()=>showSection(location.hash.slice(1)));showSection(location.hash.slice(1)||'visao');
+function openAluno(btn){const d=btn.dataset;const fields=[['Nome completo',d.nome],['E-mail',d.email],['Celular',d.celular],['Data de nascimento',d.nascimento],['Plano',d.plano],['Situação do plano',d.situacao],['Cadastro facial',d.facial],['Vencimento',d.vencimento]];const root=document.getElementById('alunoDetalhes');root.replaceChildren();fields.forEach(([label,value])=>{const p=document.createElement('p');const b=document.createElement('strong');b.textContent=label+': ';p.append(b,document.createTextNode(value||'Não informado'));root.append(p)});document.getElementById('alunoModal').showModal()}
+function openPlano(btn){const d=btn.dataset;document.getElementById('planoAlunoNome').textContent='Plano de '+d.nome;document.getElementById('planoForm').action='/admin/alunos/'+encodeURIComponent(d.id)+'/plano';document.getElementById('pagamentoForm').action='/admin/alunos/'+encodeURIComponent(d.id)+'/pagamento';document.getElementById('planoNome').value=d.plano||'3 acessos por semana';document.getElementById('planoSituacao').value=d.situacao||'AGUARDANDO';document.getElementById('planoVencimento').value=d.vencimento||'';document.getElementById('planoModal').showModal()}
+function editModelo(btn){const d=btn.dataset;document.getElementById('modeloId').disabled=false;document.getElementById('modeloId').value=d.id;document.getElementById('modeloNome').value=d.nome;document.getElementById('modeloDivisao').value=d.divisao;document.getElementById('modeloExercicios').value=d.exercicios;document.getElementById('modeloSubmit').textContent='Salvar alterações';document.getElementById('modeloForm').scrollIntoView({behavior:'smooth',block:'start'})}
+function resetModelo(){document.getElementById('modeloForm').reset();document.getElementById('modeloId').disabled=true;document.getElementById('modeloSubmit').textContent='+ Salvar modelo'}
+</script></body></html>
