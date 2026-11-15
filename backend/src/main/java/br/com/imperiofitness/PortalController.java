@@ -25,8 +25,11 @@ public class PortalController {
  private final AlunoRepository alunos;
  private final MatriculaRepository matriculas;
  private final PasswordEncoder encoder;
- public PortalController(AlunoRepository alunos,MatriculaRepository matriculas,PasswordEncoder encoder){
-  this.alunos=alunos;this.matriculas=matriculas;this.encoder=encoder;
+ private final TreinoAtribuidoRepository treinos;
+ private final NotificacaoRepository notificacoes;
+ private final PagamentoRepository pagamentos;
+ public PortalController(AlunoRepository alunos,MatriculaRepository matriculas,PasswordEncoder encoder,TreinoAtribuidoRepository treinos,NotificacaoRepository notificacoes,PagamentoRepository pagamentos){
+  this.alunos=alunos;this.matriculas=matriculas;this.encoder=encoder;this.treinos=treinos;this.notificacoes=notificacoes;this.pagamentos=pagamentos;
  }
  @GetMapping("/ativar-conta")
  public String ativacao(@RequestParam(defaultValue="") String token,Model model){
@@ -100,6 +103,9 @@ public class PortalController {
   Aluno aluno=alunos.findByEmailIgnoreCase(principal.getName()).orElseThrow();
   model.addAttribute("aluno",aluno);
   model.addAttribute("matriculas",matriculas.findByAlunoIdOrderByCriadaEmDesc(aluno.id));
+  model.addAttribute("treinosOficiais",treinos.findByAlunoIdOrderByCriadoEmDesc(aluno.id));
+  model.addAttribute("notificacoesAluno",aluno.notificacoesAtivas?notificacoes.paraAluno(aluno.id,"ATIVO".equals(aluno.situacaoPlano)):java.util.List.of());
+  model.addAttribute("pagamentosAluno",pagamentos.findByAlunoIdOrderByRegistradoEmDesc(aluno.id));
   return "portal";
  }
  @PostMapping("/portal/matriculas")
@@ -111,4 +117,13 @@ public class PortalController {
   redirect.addFlashAttribute("sucesso","Solicitação de matrícula recebida.");
   return "redirect:/portal";
  }
+ @PostMapping("/portal/notificacoes")
+ public String preferenciasNotificacoes(Principal principal,@RequestParam(defaultValue="false") boolean ativas,RedirectAttributes redirect){
+  Aluno aluno=alunos.findByEmailIgnoreCase(principal.getName()).orElseThrow();
+  aluno.notificacoesAtivas=ativas;
+  alunos.save(aluno);
+  redirect.addFlashAttribute("sucesso",ativas?"Notificações ativadas.":"Notificações desativadas.");
+  return "redirect:/portal#perfil";
+ }
+
 }
