@@ -18,6 +18,8 @@ public class Aluno {
  @Column(nullable=false,length=24) public String situacaoPlano="AGUARDANDO";
  @Column(nullable=false,length=24) public String cadastroFacial="PELO_APLICATIVO";
  public java.time.LocalDate vencimentoPlano;
+ @Column(unique=true,length=80) public String tokenAtivacao;
+ public java.time.LocalDateTime expiracaoAtivacao;
  protected Aluno() {}
  public Aluno(String nome,String email,String senhaHash){this.nome=nome;this.email=email;this.senhaHash=senhaHash;}
  public Aluno(String nome,String email,String senhaHash,LocalDate dataNascimento,String celular){
