@@ -88,6 +88,22 @@ public class AdminController {
   redirect.addFlashAttribute("linkAtivacao","/ativar-conta?token="+token);
   return "redirect:/admin/portal#cadastrar";
  }
+ @PostMapping("/alunos/{id}/dados")
+ public String editarDados(@PathVariable Long id,@RequestParam String nome,@RequestParam String celular,
+  @RequestParam String dataNascimento,@RequestParam String facial,RedirectAttributes redirect){
+  var found=alunos.findById(id);
+  if(found.isEmpty())return fail(redirect,"Aluno não encontrado.","visao");
+  String tel=celular.replaceAll("\\D","");
+  if(nome.trim().length()<3||!nome.trim().contains(" ")||tel.length()<10||tel.length()>11||
+     !Set.of("PELO_APLICATIVO","PENDENTE","CONCLUIDO").contains(facial))
+   return fail(redirect,"Confira os dados do aluno.","visao");
+  LocalDate nascimento;
+  try{nascimento=LocalDate.parse(dataNascimento);}catch(Exception e){return fail(redirect,"Data inválida.","visao");}
+  if(!nascimento.isBefore(LocalDate.now())||nascimento.isBefore(LocalDate.now().minusYears(120)))
+   return fail(redirect,"Data de nascimento inválida.","visao");
+  Aluno a=found.get();a.nome=nome.trim();a.celular=tel;a.dataNascimento=nascimento;a.cadastroFacial=facial;alunos.save(a);
+  return done(redirect,"Dados do aluno atualizados.","visao");
+ }
  @PostMapping("/alunos/{id}/plano")
  public String atualizarPlano(@PathVariable Long id,@RequestParam String plano,@RequestParam String situacao,
   @RequestParam(required=false) String vencimento,RedirectAttributes redirect){
