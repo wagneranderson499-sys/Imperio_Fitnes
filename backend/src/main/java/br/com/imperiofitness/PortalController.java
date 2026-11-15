@@ -61,6 +61,7 @@ public class PortalController {
    return "redirect:/cadastro?modo=login"+planoQuery(plano);
   }
   Aluno novoAluno=alunos.save(new Aluno(nome,email,encoder.encode(senha),nascimento,digitos));
+  request.getSession(true);
   request.changeSessionId();
   var auth=new UsernamePasswordAuthenticationToken(novoAluno.email,null,java.util.List.of(new SimpleGrantedAuthority("ROLE_CLIENTE")));
   var context=SecurityContextHolder.createEmptyContext();
