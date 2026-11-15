@@ -39,7 +39,7 @@ public class PortalController {
  public String ativar(@RequestParam String token,@RequestParam String senha,RedirectAttributes redirect){
   var aluno=alunos.findByTokenAtivacao(token).filter(a->a.expiracaoAtivacao!=null&&a.expiracaoAtivacao.isAfter(java.time.LocalDateTime.now()));
   if(aluno.isEmpty())return "redirect:/ativar-conta?token=invalido";
-  boolean segura=senha.length()>=10&&senha.length()<=72&&senha.matches("(?s).*\\\\p{Lu}.*")&&senha.matches("(?s).*\\\\p{Ll}.*")&&senha.matches("(?s).*\\\\d.*")&&senha.matches("(?s).*[^\\\\p{L}\\\\d\\\\s].*");
+  boolean segura=senha.length()>=10&&senha.length()<=72&&senha.matches("(?s).*\\p{Lu}.*")&&senha.matches("(?s).*\\p{Ll}.*")&&senha.matches("(?s).*\\d.*")&&senha.matches("(?s).*[^\\p{L}\\d\\s].*");
   if(!segura){redirect.addFlashAttribute("erro","A senha precisa ter 10 caracteres, maiúscula, minúscula, número e símbolo.");return "redirect:/ativar-conta?token="+token;}
   Aluno a=aluno.get();a.senhaHash=encoder.encode(senha);a.tokenAtivacao=null;a.expiracaoAtivacao=null;alunos.save(a);
   redirect.addFlashAttribute("sucesso","Conta ativada! Entre com seu e-mail e senha.");
