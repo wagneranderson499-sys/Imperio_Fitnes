@@ -28,6 +28,23 @@ public class PortalController {
  public PortalController(AlunoRepository alunos,MatriculaRepository matriculas,PasswordEncoder encoder){
   this.alunos=alunos;this.matriculas=matriculas;this.encoder=encoder;
  }
+ @GetMapping("/ativar-conta")
+ public String ativacao(@RequestParam(defaultValue="") String token,Model model){
+  var aluno=alunos.findByTokenAtivacao(token).filter(a->a.expiracaoAtivacao!=null&&a.expiracaoAtivacao.isAfter(java.time.LocalDateTime.now()));
+  model.addAttribute("token",token);
+  model.addAttribute("valido",aluno.isPresent());
+  return "ativar-conta";
+ }
+ @PostMapping("/ativar-conta")
+ public String ativar(@RequestParam String token,@RequestParam String senha,RedirectAttributes redirect){
+  var aluno=alunos.findByTokenAtivacao(token).filter(a->a.expiracaoAtivacao!=null&&a.expiracaoAtivacao.isAfter(java.time.LocalDateTime.now()));
+  if(aluno.isEmpty())return "redirect:/ativar-conta?token=invalido";
+  boolean segura=senha.length()>=10&&senha.length()<=72&&senha.matches("(?s).*\\\\p{Lu}.*")&&senha.matches("(?s).*\\\\p{Ll}.*")&&senha.matches("(?s).*\\\\d.*")&&senha.matches("(?s).*[^\\\\p{L}\\\\d\\\\s].*");
+  if(!segura){redirect.addFlashAttribute("erro","A senha precisa ter 10 caracteres, maiúscula, minúscula, número e símbolo.");return "redirect:/ativar-conta?token="+token;}
+  Aluno a=aluno.get();a.senhaHash=encoder.encode(senha);a.tokenAtivacao=null;a.expiracaoAtivacao=null;alunos.save(a);
+  redirect.addFlashAttribute("sucesso","Conta ativada! Entre com seu e-mail e senha.");
+  return "redirect:/cadastro?modo=login";
+ }
  private String planoQuery(String plano){return plano==null||plano.isBlank()?"":"&plano="+URLEncoder.encode(plano,StandardCharsets.UTF_8);}
  @GetMapping("/cadastro")
  public String cadastro(@RequestParam(defaultValue="") String plano,@RequestParam(defaultValue="cadastro") String modo,Model model,HttpSession session){
