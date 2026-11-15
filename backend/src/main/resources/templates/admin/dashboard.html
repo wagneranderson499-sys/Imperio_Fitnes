@@ -1,1 +1,88 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin | Império Fitness</title><script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script></head><body class="bg-zinc-950 text-white min-h-screen"><div class="flex min-h-screen"><aside class="w-64 bg-zinc-900 p-6 border-r border-amber-600/30"><h1 class="text-xl font-bold text-amber-400 mb-10">IMPÉRIO FITNESS</h1><a href="/admin" class="block p-3 bg-zinc-800 rounded">Matrículas</a><a href="/" class="block p-3 mt-3 text-zinc-400">Ver Home</a><form action="/logout" method="post" class="mt-8"><input type="hidden" name="_csrf" th:value="${_csrf.token}"><button class="text-zinc-400">Sair</button></form></aside><main class="flex-1 p-8"><h2 class="text-3xl font-bold mb-8">Matrículas recebidas</h2><div class="overflow-x-auto"><table class="w-full text-left"><thead class="text-amber-400"><tr><th class="p-3">Aluno</th><th>Plano</th><th>Status</th><th>Data</th></tr></thead><tbody><tr th:each="m : ${matriculas}" class="border-t border-zinc-800"><td class="p-3" th:text="${m.aluno.nome}">Aluno</td><td th:text="${m.plano}">Plano</td><td th:text="${m.status}">Pendente</td><td th:text="${m.criadaEm}">Data</td></tr></tbody></table><p th:if="${#lists.isEmpty(matriculas)}" class="text-zinc-400 mt-6">Nenhuma matrícula ainda.</p></div></main></div></body></html>
+<!doctype html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gestão de Alunos | Império Fitness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#09090b;--panel:#18181b;--border:#34343a;--gold:#ffc21a;--muted:#aaaab2;--text:#f8f8f8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif}
+a{color:inherit;text-decoration:none}button,input,select{font:inherit}button{cursor:pointer}
+.layout{display:grid;grid-template-columns:265px minmax(0,1fr);min-height:100vh}
+aside{background:#111113;border-right:1px solid var(--border);padding:28px 19px;position:sticky;top:0;height:100vh}
+.brand{display:flex;gap:12px;align-items:center;border-bottom:1px solid var(--border);padding-bottom:25px}
+.brandmark{display:grid;place-items:center;border:2px solid var(--gold);color:var(--gold);border-radius:50%;height:47px;width:47px;font-weight:900;font-size:24px}
+.brand strong{font:900 25px 'Barlow Condensed',sans-serif;letter-spacing:1px}.brand small{display:block;font-size:10px;letter-spacing:2px;color:var(--gold)}
+nav{margin-top:28px;display:grid;gap:7px}nav a{padding:13px 15px;border-radius:10px;color:#bcbcc4;font-size:13px;font-weight:700}
+nav a:hover,nav a.active{background:#302917;color:var(--gold)}.logout{margin-top:30px}
+.logout button{width:100%;background:transparent;border:1px solid var(--border);border-radius:10px;color:#ddd;padding:12px}
+main{padding:32px clamp(18px,4vw,62px);min-width:0;max-width:1600px;width:100%;margin:auto}
+.eyebrow{font-size:11px;letter-spacing:3px;color:var(--gold);font-weight:800}
+h1,h2,h3{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;line-height:1}
+h1{font-size:clamp(38px,5vw,58px);margin:9px 0 12px}h2{font-size:31px;margin:0 0 17px}
+p{color:var(--muted);line-height:1.65}.heading{margin-bottom:32px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.stat,.panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px}
+.stat strong{display:block;font:800 43px 'Barlow Condensed',sans-serif;color:var(--gold);margin-top:10px}.stat span{color:var(--muted);font-size:13px}
+section{margin-top:37px;scroll-margin-top:20px}.panel{margin-top:15px}
+.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:700px;text-align:left}
+th{color:var(--gold);font-size:11px;letter-spacing:1px;text-transform:uppercase}
+td,th{padding:14px 10px;border-bottom:1px solid #303034;font-size:13px}td{color:#ddd}
+td small{display:block;color:var(--muted);margin-top:4px}.status{display:inline-block;padding:6px 10px;border-radius:8px;background:#3b311a;color:#ffd46a;font-size:11px;font-weight:800}
+.status.aprovada{background:#173b2c;color:#8be7b8}.status.recusada,.status.cancelada{background:#431e24;color:#ffb3bd}
+.formrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+select{background:#25252a;color:#fff;border:1px solid #505057;border-radius:8px;padding:9px;max-width:150px}
+button.primary{background:var(--gold);color:#111;border:0;border-radius:8px;padding:10px 13px;font-weight:800}
+.notice{padding:15px 18px;border:1px solid #6a5320;border-radius:10px;background:#292315;color:#ffe0a2}
+.placeholder{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.placeholder article{background:#18181b;border:1px solid var(--border);border-radius:14px;padding:21px}
+.placeholder h3{font-size:23px;margin:0}.placeholder p{font-size:13px;margin-bottom:0}
+footer{padding:35px 0;color:var(--muted);font-size:12px}
+@media(max-width:900px){.layout{display:block}aside{position:relative;height:auto;padding:18px}nav{display:flex;overflow:auto;margin-top:15px}nav a{white-space:nowrap}.logout{margin-top:10px}.brand{padding-bottom:12px}main{padding:22px 16px}.stats{grid-template-columns:1fr}.placeholder{grid-template-columns:1fr}}
+</style>
+</head><body><div class="layout">
+<aside><div class="brand"><div class="brandmark">IF</div><div><strong>IMPÉRIO FITNESS</strong><small>GESTÃO DE ALUNOS</small></div></div>
+<nav aria-label="Menu administrativo">
+<a href="#resumo" class="active">Visão geral</a>
+<a href="#alunos">Alunos cadastrados</a>
+<a href="#matriculas">Matrículas e planos</a>
+<a href="#proximas">Treinos e demais módulos</a>
+<a href="/">Visualizar Home</a>
+</nav>
+<form class="logout" method="post" action="/logout"><input type="hidden" name="_csrf" th:value="${_csrf.token}"><button type="submit">Sair da conta</button></form>
+</aside>
+<main><div class="heading" id="resumo"><div class="eyebrow">ADMINISTRAÇÃO · PORTAL DO ALUNO</div><h1>Gestão de alunos</h1><p>Dados reais do cadastro e das solicitações de matrícula, sincronizados com o Portal do Aluno.</p></div>
+<div th:if="${sucesso}" class="notice" role="status" th:text="${sucesso}">Atualização realizada.</div>
+<div th:if="${erro}" class="notice" role="alert" th:text="${erro}">Não foi possível atualizar.</div>
+<div class="stats">
+<div class="stat"><span>Alunos cadastrados</span><strong th:text="${#lists.size(alunos)}">0</strong></div>
+<div class="stat"><span>Matrículas pendentes</span><strong th:text="${totalPendentes}">0</strong></div>
+<div class="stat"><span>Matrículas aprovadas</span><strong th:text="${totalAprovadas}">0</strong></div>
+</div>
+<section id="alunos"><h2>Alunos cadastrados</h2><div class="panel tablewrap"><table><thead><tr><th>Nome</th><th>E-mail</th><th>Celular</th><th>Data de nascimento</th></tr></thead>
+<tbody><tr th:each="a : ${alunos}"><td th:text="${a.nome}">Nome</td><td th:text="${a.email}">E-mail</td><td th:text="${a.celular}">Celular</td><td th:text="${a.dataNascimento}">Nascimento</td></tr></tbody></table>
+<p th:if="${#lists.isEmpty(alunos)}">Nenhum aluno cadastrado.</p></div></section>
+<section id="matriculas"><h2>Matrículas e planos</h2><p>O status atualizado aqui é salvo no banco de dados e pode ser consultado pelo Portal do Aluno.</p>
+<div class="panel tablewrap"><table><thead><tr><th>Aluno</th><th>Plano solicitado</th><th>Situação</th><th>Data</th><th>Gerenciar</th></tr></thead>
+<tbody><tr th:each="m : ${matriculas}"><td><strong th:text="${m.aluno.nome}">Aluno</strong><small th:text="${m.aluno.email}">E-mail</small></td><td th:text="${m.plano}">Plano</td>
+<td><span class="status" th:classappend="${#strings.toLowerCase(m.status)}" th:text="${m.status}">PENDENTE</span></td>
+<td th:text="${#temporals.format(m.criadaEm,'dd/MM/yyyy HH:mm')}">Data</td>
+<td><form class="formrow" th:action="@{/admin/matriculas/{id}/status(id=${m.id})}" method="post">
+<input type="hidden" name="_csrf" th:value="${_csrf.token}">
+<select name="status" th:attr="aria-label=|Alterar status da matrícula de ${m.aluno.nome}|" required>
+<option value="PENDENTE" th:selected="${m.status == 'PENDENTE'}">Pendente</option>
+<option value="APROVADA" th:selected="${m.status == 'APROVADA'}">Aprovada</option>
+<option value="RECUSADA" th:selected="${m.status == 'RECUSADA'}">Recusada</option>
+<option value="CANCELADA" th:selected="${m.status == 'CANCELADA'}">Cancelada</option>
+</select><button class="primary" type="submit">Salvar</button></form></td></tr></tbody></table>
+<p th:if="${#lists.isEmpty(matriculas)}">Nenhuma solicitação de matrícula recebida.</p></div></section>
+<section id="proximas"><h2>Próximos módulos de integração</h2><p>O arquivo de referência inclui estas áreas, mas elas ainda precisam de modelos e regras reais no Spring Boot. Não são apresentados dados fictícios como se fossem registros dos alunos.</p>
+<div class="placeholder">
+<article><h3>Treinos e biblioteca</h3><p>Cadastrar exercícios, criar fichas e atribuir treinos individualmente.</p></article>
+<article><h3>Frequência e catraca</h3><p>Registrar acessos verificados e acompanhar o histórico de cada aluno.</p></article>
+<article><h3>Mensalidades</h3><p>Gerenciar vencimentos e comprovantes sem simular cobranças reais.</p></article>
+<article><h3>Solicitações e notificações</h3><p>Receber pedidos dos alunos e configurar mensagens por categoria.</p></article>
+</div></section>
+<footer>Império Fitness · Administração de alunos · Área restrita</footer>
+</main></div></body></html>
