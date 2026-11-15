@@ -70,9 +70,17 @@ public class AdminController {
    return fail(redirect,"Data de nascimento inválida.","cadastrar");
   if(!Set.of("PELO_APLICATIVO","PENDENTE","CONCLUIDO").contains(facial))
    return fail(redirect,"Situação facial inválida.","cadastrar");
-  // A recepção não define senha de terceiros: o aluno deve criar a própria senha pelo fluxo seguro.
-  // Não se cria uma conta com credencial compartilhada ou previsível.
-  return fail(redirect,"Para segurança, o aluno deve criar sua conta e senha em /cadastro. Depois, gerencie seu plano e treino aqui.","cadastrar");
+  byte[] bytes=new byte[32];new java.security.SecureRandom().nextBytes(bytes);
+  String token=java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+  Aluno a=new Aluno(nome,email,"!CONTA_PENDENTE!",nascimento,tel);
+  a.planoAtual=plano.isBlank()?null:plano.trim();
+  a.situacaoPlano=situacao;a.cadastroFacial=facial;
+  a.tokenAtivacao=token;a.expiracaoAtivacao=java.time.LocalDateTime.now().plusHours(48);
+  alunos.save(a);
+  if(modeloId!=null)modelos.findById(modeloId).ifPresent(m->atribuicoes.save(new TreinoAtribuido(a,m)));
+  redirect.addFlashAttribute("sucesso","Aluno cadastrado. Entregue o link de ativação ao próprio aluno; ele define a senha.");
+  redirect.addFlashAttribute("linkAtivacao","/ativar-conta?token="+token);
+  return "redirect:/admin/portal#cadastrar";
  }
  @PostMapping("/alunos/{id}/plano")
  public String atualizarPlano(@PathVariable Long id,@RequestParam String plano,@RequestParam String situacao,
