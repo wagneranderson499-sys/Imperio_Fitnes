@@ -104,7 +104,7 @@ public class PortalController {
   model.addAttribute("aluno",aluno);
   model.addAttribute("matriculas",matriculas.findByAlunoIdOrderByCriadaEmDesc(aluno.id));
   model.addAttribute("treinosOficiais",treinos.findByAlunoIdOrderByCriadoEmDesc(aluno.id));
-  model.addAttribute("notificacoesAluno",aluno.notificacoesAtivas?notificacoes.paraAluno(aluno.id,"ATIVO".equals(aluno.situacaoPlano)):java.util.List.of());
+  model.addAttribute("notificacoesAluno",!Boolean.FALSE.equals(aluno.notificacoesAtivas)?notificacoes.paraAluno(aluno.id,"ATIVO".equals(aluno.situacaoPlano)):java.util.List.of());
   model.addAttribute("pagamentosAluno",pagamentos.findByAlunoIdOrderByRegistradoEmDesc(aluno.id));
   return "portal";
  }
