@@ -1,0 +1,5 @@
+Abra admin-home.html para visualizar o Admin da Home com seu submenu aberto.
+Abra admin-portal.html para visualizar o Admin do Portal com seu submenu aberto.
+Ambos têm menu lateral idêntico, e cada opção do painel ativo é clicável.
+O portal-aluno.html foi incluído para o link de demonstração.
+Protótipos: não conectados ao banco de dados.

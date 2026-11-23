@@ -950,7 +950,19 @@
             if (frame.contentWindow) frame.contentWindow.postMessage({ imperioHomePage: page }, '*');
         }
 
-        window.addEventListener('hashchange', () => showSection(location.hash.slice(1))); showSection(location.hash.slice(1) || 'visao');
+        // Navegação explícita: cada clique abre a seção correspondente,
+        // inclusive quando o endereço já contém o mesmo hash.
+        document.querySelectorAll('a[data-section], a[data-home-page], .toplinks a[href^="#"]').forEach(link => {
+            link.addEventListener('click', event => {
+                event.preventDefault();
+                const target = link.dataset.homePage
+                    ? 'home/' + link.dataset.homePage
+                    : (link.dataset.section || link.getAttribute('href').slice(1));
+                showSection(target);
+            });
+        });
+        window.addEventListener('hashchange', () => showSection(location.hash.slice(1) || 'visao'));
+        showSection(location.hash.slice(1) || 'visao');
         function openAluno(btn) { const d = btn.dataset; const fields = [['Nome completo', d.nome], ['E-mail', d.email], ['Celular', d.celular], ['Data de nascimento', d.nascimento], ['Plano', d.plano], ['Situação do plano', d.situacao], ['Cadastro facial', d.facial], ['Vencimento', d.vencimento]]; const root = document.getElementById('alunoDetalhes'); root.replaceChildren(); fields.forEach(([label, value]) => { const p = document.createElement('p'); const b = document.createElement('strong'); b.textContent = label + ': '; p.append(b, document.createTextNode(value || 'Não informado')); root.append(p) }); document.getElementById('alunoDadosForm').action = '/admin/alunos/' + encodeURIComponent(d.id) + '/dados'; document.getElementById('editAlunoNome').value = d.nome || ''; document.getElementById('editAlunoCelular').value = d.celular || ''; document.getElementById('editAlunoNascimento').value = d.nascimento || ''; document.getElementById('editAlunoFacial').value = d.facial || 'PENDENTE'; document.getElementById('alunoModal').showModal() }
         function openPlano(btn) { const d = btn.dataset; document.getElementById('planoAlunoNome').textContent = 'Plano de ' + d.nome; document.getElementById('planoForm').action = '/admin/alunos/' + encodeURIComponent(d.id) + '/plano'; document.getElementById('pagamentoForm').action = '/admin/alunos/' + encodeURIComponent(d.id) + '/pagamento'; document.getElementById('planoNome').value = d.plano || '3 acessos por semana'; document.getElementById('planoSituacao').value = d.situacao || 'AGUARDANDO'; document.getElementById('planoVencimento').value = d.vencimento || ''; document.getElementById('planoModal').showModal() }
         function editModelo(btn) { const d = btn.dataset; document.getElementById('modeloId').disabled = false; document.getElementById('modeloId').value = d.id; document.getElementById('modeloNome').value = d.nome; document.getElementById('modeloDivisao').value = d.divisao; document.getElementById('modeloExercicios').value = d.exercicios; document.getElementById('modeloSubmit').textContent = 'Salvar alterações'; document.getElementById('modeloForm').scrollIntoView({ behavior: 'smooth', block: 'start' }) }

@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Admin do Portal | Império Fitness</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&amp;family=DM+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+        :root {
+            --bg: #f3f5f8;
+            --white: #fff;
+            --ink: #182335;
+            --muted: #747d8c;
+            --line: #e1e7ee;
+            --gold: #ffc21a
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font: 14px 'DM Sans', Arial, sans-serif
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Barlow Condensed', Impact, sans-serif;
+            text-transform: uppercase;
+            margin: 0 0 15px
+        }
+
+        h1 {
+            font-size: 37px
+        }
+
+        h2 {
+            font-size: 28px
+        }
+
+        h3 {
+            font-size: 26px
+        }
+
+        p {
+            color: var(--muted);
+            line-height: 1.55;
+            margin: 7px 0 18px
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit
+        }
+
+        button {
+            cursor: pointer
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 255px minmax(0, 1fr);
+            min-height: 100vh
+        }
+
+        .sidebar {
+            background: #111419;
+            color: white;
+            padding: 24px 15px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto
+        }
+
+        .brand {
+            padding: 10px 12px 22px;
+            border-bottom: 1px solid #30343b;
+            font: 900 27px 'Barlow Condensed', sans-serif;
+            letter-spacing: .8px
+        }
+
+        .brand b {
+            color: var(--gold)
+        }
+
+        .brand small {
+            display: block;
+            font: 700 10px 'DM Sans', sans-serif;
+            letter-spacing: 2px;
+            color: #b5b7c0;
+            margin-top: 7px
+        }
+
+        .nav {
+            display: block;
+            padding: 12px 14px;
+            border-radius: 10px;
+            color: #d3d5d9;
+            margin: 6px 0;
+            font-weight: 700;
+            font-size: 12px
+        }
+
+        .nav:hover,
+        .nav.active {
+            background: #353022;
+            color: #ffd264
+        }
+
+        .sidebar-label {
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: #999;
+            margin: 24px 14px 12px
+        }
+
+        .admin-submenu {
+            padding: 7px 0 10px 10px;
+            border-left: 2px solid #5a481c;
+            margin: 7px 0 13px 15px
+        }
+
+        .admin-submenu .nav {
+            font-size: 12px;
+            padding: 10px 11px
+        }
+
+        .admin-submenu .nav.active {
+            background: #353022;
+            color: #ffd264
+        }
+
+        .logout {
+            width: 100%;
+            background: transparent;
+            border: 1px solid #41434a;
+            color: #eee;
+            padding: 11px;
+            border-radius: 9px;
+            margin-top: 24px
+        }
+
+        main {
+            padding: 20px clamp(16px, 3vw, 48px) 65px;
+            min-width: 0;
+            max-width: 1550px;
+            width: 100%;
+            margin: auto
+        }
+
+        .section {
+            display: none;
+            scroll-margin-top: 20px
+        }
+
+        .section.active {
+            display: block
+        }
+
+        .heading {
+            background: white;
+            border: 1px solid var(--line);
+            padding: 23px 25px;
+            border-radius: 18px;
+            margin-bottom: 24px;
+            box-shadow: 0 6px 18px #192b4210
+        }
+
+        .heading h1 {
+            margin-bottom: 8px
+        }
+
+        .toplinks {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+
+        .toplinks a {
+            border: 1px solid #d3dfe9;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 800;
+            font-size: 12px
+        }
+
+        .toplinks a.current {
+            background: #ffc21a;
+            border-color: #ffc21a;
+            color: #161616
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 17px;
+            padding: 22px;
+            margin: 18px 0;
+            box-shadow: 0 7px 18px #15263a09
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 15px
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 15px
+        }
+
+        .stat {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 20px
+        }
+
+        .stat small {
+            display: block;
+            color: var(--muted)
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 24px;
+            margin-top: 9px
+        }
+
+        .quick {
+            display: flex;
+            gap: 9px;
+            flex-wrap: wrap
+        }
+
+        .btn {
+            border: 1px solid #d4dfe9;
+            border-radius: 9px;
+            padding: 11px 14px;
+            background: white;
+            color: #1d2b3e;
+            font-weight: 800;
+            font-size: 12px
+        }
+
+        .btn:hover {
+            border-color: #ffc21a
+        }
+
+        .btn.primary {
+            background: var(--gold);
+            border-color: #e6aa00;
+            color: #111
+        }
+
+        .btn.danger {
+            color: #c32c40;
+            border-color: #ffced5;
+            background: #fff4f5
+        }
+
+        .btn.small {
+            padding: 8px 11px
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px
+        }
+
+        .field label {
+            font-size: 12px;
+            font-weight: 800;
+            color: #536071
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #d9e0e8;
+            border-radius: 10px;
+            background: #fff;
+            color: #1d2939;
+            min-height: 45px
+        }
+
+        .field textarea {
+            min-height: 110px;
+            resize: vertical
+        }
+
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            outline: 2px solid #ffcc36;
+            outline-offset: 1px
+        }
+
+        .field.full {
+            grid-column: 1/-1
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 17px
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            border-bottom: 1px solid #e8edf2;
+            padding: 15px 0
+        }
+
+        .item:last-child {
+            border: 0
+        }
+
+        .item strong {
+            display: block
+        }
+
+        .item small {
+            display: block;
+            color: #7c8592;
+            margin-top: 5px
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 7px;
+            align-items: center;
+            flex-wrap: wrap
+        }
+
+        .pill {
+            background: #e6f6ec;
+            color: #248354;
+            border-radius: 30px;
+            padding: 7px 11px;
+            font-size: 11px;
+            font-weight: 800
+        }
+
+        .pill.warn {
+            background: #fff1c7;
+            color: #986a06
+        }
+
+        .pill.bad {
+            background: #ffe9ec;
+            color: #b43b4e
+        }
+
+        .tablewrap {
+            overflow-x: auto
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 730px
+        }
+
+        th {
+            text-align: left;
+            font-size: 11px;
+            color: #788394;
+            text-transform: uppercase;
+            letter-spacing: .7px
+        }
+
+        td,
+        th {
+            padding: 13px 10px;
+            border-bottom: 1px solid #e9edf2;
+            vertical-align: middle
+        }
+
+        td {
+            font-size: 12px
+        }
+
+        td form {
+            display: flex;
+            align-items: center;
+            gap: 7px
+        }
+
+        td select {
+            border: 1px solid #d9e0e8;
+            border-radius: 8px;
+            padding: 8px;
+            background: white;
+            max-width: 160px
+        }
+
+        .alert {
+            padding: 13px 16px;
+            border-radius: 10px;
+            background: #fff6db;
+            border: 1px solid #f0d89c;
+            color: #71531b;
+            margin: 15px 0
+        }
+
+        .note {
+            padding: 13px 15px;
+            border: 1px solid #f4dfaa;
+            border-radius: 10px;
+            background: #fff9eb;
+            color: #916d21;
+            font-size: 12px;
+            line-height: 1.5
+        }
+
+        .muted {
+            color: #788394;
+            font-size: 12px
+        }
+
+        .hidden {
+            display: none !important
+        }
+
+        .modal {
+            border: 0;
+            border-radius: 18px;
+            padding: 26px;
+            max-width: 570px;
+            width: calc(100% - 30px);
+            box-shadow: 0 30px 100px #0005
+        }
+
+        .modal::backdrop {
+            background: #0c1524a8
+        }
+
+        @media(max-width:900px) {
+            .layout {
+                display: block
+            }
+
+            .sidebar {
+                position: relative;
+                height: auto;
+                padding: 12px
+            }
+
+            .brand {
+                padding: 8px 12px
+            }
+
+            .sidebar-label {
+                margin: 12px
+            }
+
+            .menu {
+                display: flex;
+                overflow-x: auto;
+                gap: 6px
+            }
+
+            .nav {
+                white-space: nowrap
+            }
+
+            .logout {
+                margin: 7px 0
+            }
+
+            .grid,
+            .stats {
+                grid-template-columns: 1fr
+            }
+
+            main {
+                padding: 16px
+            }
+
+            .item {
+                align-items: flex-start;
+                flex-direction: column
+            }
+        }
+    </style>
+<style id="unified-sidebar-css">
+.unified-sidebar{background:#111317!important;color:#e6e8ed!important;width:240px!important;min-width:240px!important;max-width:240px!important;min-height:100vh!important;padding:24px 13px!important;box-sizing:border-box!important;border-right:1px solid #2b2d32!important;display:block!important;overflow:visible!important}
+.unified-sidebar .ubrand{font-family:Arial,sans-serif!important;font-weight:900!important;font-size:20px!important;letter-spacing:-.8px!important;line-height:1.1!important;padding:4px 0 19px!important;border-bottom:1px solid #282b30!important;color:#fff!important}
+.unified-sidebar .ubrand b{color:#ffc21a!important}
+.unified-sidebar .ubrand small{display:block!important;font-size:9px!important;letter-spacing:2.1px!important;color:#aab0b9!important;margin-top:8px!important}
+.unified-sidebar .ulabel{font:700 9px Arial,sans-serif!important;letter-spacing:2px!important;color:#9098a5!important;margin:22px 8px 9px!important}
+.unified-sidebar a.uadmin,.unified-sidebar a.unav{display:block!important;text-decoration:none!important;font:700 12px Arial,sans-serif!important;letter-spacing:0!important;color:#dce0e8!important;padding:13px 11px!important;margin:3px 0!important;border-radius:10px!important;line-height:1.3!important;background:transparent!important;border:1px solid transparent!important;box-shadow:none!important}
+.unified-sidebar a.uadmin.uactive{background:#393426!important;color:#ffc21a!important}
+.unified-sidebar a.uadmin:not(.uactive){border-color:#85878c!important}
+.unified-sidebar a.unav{padding:12px 11px!important}
+.unified-sidebar a.unav.uitem-active,.unified-sidebar a.unav:hover{background:#25272c!important;color:#ffc21a!important}
+.unified-sidebar .usub[hidden]{display:none!important}
+.unified-sidebar .ufooter{margin-top:28px!important;border-top:1px solid #2a2c30!important;padding-top:18px!important}
+.unified-sidebar .ufooter a{font:700 11px Arial,sans-serif!important;color:#bec3cd!important;text-decoration:none!important;padding:12px 8px!important;display:block!important}
+.unified-sidebar .side-links{display:none!important}
+@media(max-width:750px){.unified-sidebar{width:100%!important;min-width:0!important;max-width:none!important;min-height:0!important;position:relative!important;transform:none!important;left:auto!important;top:auto!important;height:auto!important}.admin-layout{display:block!important}.admin-main{margin-left:0!important;width:100%!important}.unified-sidebar .usub{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}.unified-sidebar .usub[hidden]{display:none!important}.unified-sidebar .usub .ulabel{grid-column:1/-1!important}}
+</style></head>
+<body><div style="padding:10px 16px;background:#fff5d6;color:#6b4d00;border-bottom:1px solid #e4ca75;font-size:12px;font-weight:700">PROTÓTIPO CLICÁVEL • Dados fictícios para apresentação • Nenhuma alteração é enviada ao servidor</div>
+<div class="layout">
+<aside class="sidebar unified-sidebar">
+<div class="ubrand">IMPÉRIO <b>FITNESS</b><small>PAINEL ADMINISTRATIVO</small></div>
+<div class="ulabel">ÁREAS DO ADMIN</div>
+<a class="uadmin" href="admin-home.html#inicio">Admin da Home</a>
+<div class="usub" hidden="" id="homeMenu">
+<div class="ulabel">ADMIN DA HOME</div><a class="unav" data-home="inicio" href="admin-home.html#inicio">Início</a><a class="unav" data-home="banner" href="admin-home.html#banner">Banner</a><a class="unav" data-home="apresentacao" href="admin-home.html#apresentacao">Apresentação</a><a class="unav" data-home="planos" href="admin-home.html#planos">Planos</a><a class="unav" data-home="galeria" href="admin-home.html#galeria">Galeria de fotos</a><a class="unav" data-home="contato" href="admin-home.html#contato">Contato e redes sociais</a><a class="unav" data-home="identidade" href="admin-home.html#identidade">Identidade visual</a><a class="unav" data-home="publicacao" href="admin-home.html#publicacao">Prévia e publicação</a>
+</div>
+<a class="uadmin uactive" href="admin-portal.html#visao">Admin do Portal</a>
+<div class="usub" id="portalMenu">
+<div class="ulabel">PORTAL DO ALUNO</div><a class="unav" data-portal="visao" href="#visao">Visão geral dos alunos</a><a class="unav" data-portal="cadastrar" href="#cadastrar">Cadastrar aluno</a><a class="unav" data-portal="treinos" href="#treinos">Gestão de treinos</a><a class="unav" data-portal="planos" href="#planos">Planos e mensalidades</a><a class="unav" data-portal="notificacoes" href="#notificacoes">Notificações dos alunos</a>
+</div>
+<div class="ufooter"><a href="portal-aluno.html">Visualizar Portal do Aluno</a></div>
+<div class="side-links" id="sideLinks" style="display:none!important"></div>
+</aside>
+<main>
+<div class="toplinks" style="margin-bottom:16px"><a href="admin-home.html">Admin da Home</a><a class="current" href="#visao">Admin do Portal</a></div>
+<div class="alert"></div>
+<div class="alert"></div>
+<div class="alert">Link de ativação do
+                aluno (válido por 48 horas): <a style="text-decoration:underline;overflow-wrap:anywhere"></a>. Entregue apenas ao aluno responsável.
+            </div>
+<section class="section active" id="visao">
+<div class="heading">
+<h1>VISÃO GERAL DOS ALUNOS</h1>
+<p>Dados sincronizados com o banco de dados. As alterações operacionais são salvas imediatamente.
+                    </p>
+</div>
+<h2>PAINEL ADMIN DO ALUNO</h2>
+<p>Gerencie a jornada do aluno, do cadastro à evolução dos treinos.</p>
+<div class="stats">
+<div class="stat"><small>Alunos cadastrados</small><strong>0</strong></div>
+<div class="stat"><small>Planos ativos</small><strong>0</strong></div>
+<div class="stat"><small>Facial pendente</small><strong>0</strong></div>
+<div class="stat"><small>Solicitações em análise</small><strong>0</strong></div>
+</div>
+<div class="card">
+<h2>ACESSOS RÁPIDOS</h2>
+<div class="quick"><button class="btn primary" onclick="showSection('cadastrar')">+ Cadastrar
+                            aluno</button><button class="btn" onclick="showSection('treinos')">Gerenciar
+                            treinos</button><button class="btn" onclick="showSection('planos')">Planos e
+                            mensalidades</button><button class="btn" onclick="showSection('notificacoes')">Notificações</button></div>
+</div>
+<div class="card">
+<h2>ALUNOS CADASTRADOS</h2>
+<p>Clique no aluno para consultar seus dados, plano e situação.</p>
+<p>Nenhum aluno cadastrado.</p>
+</div>
+<div class="card">
+<h2>SOLICITAÇÕES DE MATRÍCULA</h2>
+<div class="tablewrap">
+<table>
+<thead>
+<tr>
+<th>Aluno</th>
+<th>Plano</th>
+<th>Data</th>
+<th>Situação</th>
+<th>Ação</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card"><h3>Alunos cadastrados — demonstração</h3><div class="item"><div><strong>Mariana Costa</strong><small>mariana@exemplo.com</small></div><button class="btn" data-celular="(91) 99999-1001" data-email="mariana@exemplo.com" data-facial="CONCLUIDO" data-id="1" data-nascimento="2002-03-10" data-nome="Mariana Costa" data-plano="Acesso livre" data-situacao="ATIVO" data-vencimento="2026-12-10" onclick="openAluno(this)" type="button">Ver detalhes</button></div><div class="item"><div><strong>Lucas Almeida</strong><small>lucas@exemplo.com</small></div><button class="btn" data-celular="(91) 99999-1002" data-email="lucas@exemplo.com" data-facial="PENDENTE" data-id="2" data-nascimento="2001-08-14" data-nome="Lucas Almeida" data-plano="3 acessos por semana" data-situacao="AGUARDANDO" data-vencimento="2026-12-18" onclick="openAluno(this)" type="button">Ver detalhes</button></div></div></section>
+<section class="section" id="cadastrar">
+<div class="heading">
+<h1>CADASTRAR ALUNO</h1>
+<p>A recepção cadastra o aluno, define seu plano e entrega um convite para ele criar a própria
+                        senha.</p>
+</div>
+<div class="card">
+<h2>NOVO ALUNO</h2>
+<form action="#" data-demo="true" method="post">
+<div class="grid">
+<div class="field"><label>Nome completo *</label><input maxlength="150" minlength="3" name="nome" placeholder="Nome do aluno" required=""/></div>
+<div class="field"><label>E-mail *</label><input name="email" placeholder="aluno@exemplo.com" required="" type="email"/></div>
+<div class="field"><label>Celular / WhatsApp *</label><input name="celular" placeholder="(91) 99999-9999" required=""/></div>
+<div class="field"><label>Data de nascimento *</label><input name="dataNascimento" required="" type="date"/></div>
+<div class="field"><label>Plano contratado</label><select name="plano">
+<option value="3 acessos por semana">3 acessos por semana</option>
+<option value="2 acessos por semana">2 acessos por semana</option>
+<option value="Acesso livre">Acesso livre</option>
+</select></div>
+<div class="field"><label>Situação inicial</label><select name="situacao">
+<option value="AGUARDANDO">Aguardando ativação/pagamento</option>
+<option value="ATIVO">Ativo</option>
+<option value="SUSPENSO">Suspenso</option>
+<option value="VENCIDO">Vencido</option>
+</select></div>
+<div class="field"><label>Cadastro facial</label><select name="facial">
+<option value="PELO_APLICATIVO">Pelo aplicativo</option>
+<option value="PENDENTE">Pendente</option>
+<option value="CONCLUIDO">Concluído</option>
+</select></div>
+<div class="field"><label>Modelo de treino inicial</label><select name="modeloId">
+<option value="">Selecionar depois</option>
+</select></div>
+</div>
+<div class="actions"><button class="btn primary" type="submit">Cadastrar aluno</button><button class="btn" type="reset">Limpar campos</button></div>
+</form>
+<p class="muted">A senha nunca é definida pela recepção. O aluno recebe um link de ativação com
+                        validade de 48 horas.</p>
+</div>
+</section>
+<section class="section" id="treinos">
+<div class="heading">
+<h1>GESTÃO DE TREINOS</h1>
+<p>Crie e renomeie modelos oficiais, defina exercícios e atribua fichas a cada aluno. Atribuições
+                        devem ser realizadas por profissional habilitado.</p>
+</div>
+<div class="card">
+<h2>CRIAR MODELO DE TREINO</h2>
+<form action="#" data-demo="true" id="modeloForm" method="post"><input disabled="" id="modeloId" name="id" type="hidden"/>
+<div class="grid">
+<div class="field"><label>Nome do modelo *</label><input id="modeloNome" maxlength="120" name="nome" placeholder="Ex.: ABC — Iniciante" required=""/></div>
+<div class="field"><label>Divisão</label><select id="modeloDivisao" name="divisao">
+<option value="ABC">ABC</option>
+<option value="AB">AB</option>
+<option value="FUNCIONAL">Funcional</option>
+<option value="OUTRO">Outro</option>
+</select></div>
+<div class="field full"><label>Exercícios do modelo (um por linha; exercício — séries x
+                                    repetições)</label><textarea id="modeloExercicios" name="exercicios" placeholder="Agachamento — 3 x 12
+Leg press — 3 x 12" required=""></textarea></div>
+</div>
+<div class="actions"><button class="btn primary" id="modeloSubmit" type="submit">+ Salvar
+                                modelo</button><button class="btn" onclick="resetModelo()" type="button">Novo
+                                modelo</button></div>
+</form>
+</div>
+<div class="card">
+<h2>MODELOS DISPONÍVEIS PARA O ALUNO</h2>
+<p>Nenhum modelo cadastrado.</p>
+</div>
+<div class="card">
+<h2>ATRIBUIR TREINO A UM ALUNO</h2>
+<form action="#" data-demo="true" method="post">
+<div class="grid">
+<div class="field"><label>Aluno</label><select name="alunoId" required="">
+<option value="">Selecione</option>
+</select></div>
+<div class="field"><label>Modelo</label><select name="modeloId" required="">
+<option value="">Selecione</option>
+</select></div>
+</div>
+<div class="actions"><button class="btn primary" type="submit">Atribuir treino</button></div>
+</form>
+<p class="note">O aluno também poderá personalizar sua ficha pessoal. Treinos atribuídos
+                        oficialmente devem ser feitos por profissional habilitado.</p>
+</div>
+<div class="card"><h3>Modelos cadastrados — demonstração</h3><div class="item"><div><strong>Treino ABC — Iniciante</strong><small>Divisão ABC</small></div><button class="btn" data-divisao="ABC" data-exercicios="A: Peito e tríceps; B: Costas e bíceps; C: Pernas" data-id="1" data-nome="Treino ABC — Iniciante" onclick="editModelo(this)" type="button">Editar modelo</button></div></div></section>
+<section class="section" id="planos">
+<div class="heading">
+<h1>PLANOS DOS ALUNOS</h1>
+<p>Gerencie planos e mensalidades. Pagamentos recebidos em espécie podem ser registrados pela
+                        recepção.</p>
+</div>
+<div class="card">
+<h2>SITUAÇÃO DOS ALUNOS</h2>
+<p>Nenhum aluno cadastrado.</p>
+</div>
+<div class="card">
+<h2>HISTÓRICO DE PAGAMENTOS</h2>
+<div class="tablewrap">
+<table>
+<thead>
+<tr>
+<th>Aluno</th>
+<th>Valor (R$)</th>
+<th>Forma</th>
+<th>Data</th>
+<th>Vencimento</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+</div>
+<p>Nenhum pagamento registrado.</p>
+</div>
+<div class="card">
+<h2>REGRAS DE ACESSO</h2>
+<div class="note">Planos 2x e 3x: limites de acesso semanais conforme o contrato. Planos vencidos ou
+                        suspensos devem ser regularizados na recepção. A gestão de catraca não faz parte deste painel.
+                    </div>
+</div>
+<div class="card"><h3>Planos dos alunos — demonstração</h3><div class="item"><div><strong>Mariana Costa</strong><small>Acesso livre</small></div><button class="btn" data-id="1" data-nome="Mariana Costa" data-plano="Acesso livre" data-situacao="ATIVO" data-vencimento="2026-12-10" onclick="openPlano(this)" type="button">Gerenciar plano</button></div></div></section>
+<section class="section" id="notificacoes">
+<div class="heading">
+<h1>NOTIFICAÇÕES DOS ALUNOS</h1>
+<p>Personalize mensagens para todos os alunos, alunos ativos ou um aluno específico. Cada aluno pode
+                        ativar ou desativar todas as notificações em seu Perfil.</p>
+</div>
+<div class="card">
+<h2>CRIAR NOVA NOTIFICAÇÃO</h2>
+<form action="#" data-demo="true" method="post">
+<div class="grid">
+<div class="field"><label>Título da notificação</label><input maxlength="120" name="titulo" placeholder="Ex.: Horário especial de funcionamento" required=""/></div>
+<div class="field"><label>Categoria</label><select name="categoria">
+<option value="GERAL">Aviso geral</option>
+<option value="TREINOS">Treinos</option>
+<option value="MENSALIDADES">Mensalidades</option>
+<option value="PROMOCOES">Promoções</option>
+</select></div>
+<div class="field full"><label>Mensagem</label><textarea maxlength="2000" name="mensagem" placeholder="Escreva a mensagem que os alunos receberão..." required=""></textarea></div>
+<div class="field"><label>Destinatários</label><select id="destinatarios" name="destinatarios" onchange="document.getElementById('alunoDestino').classList.toggle('hidden',this.value!=='ALUNO')">
+<option value="TODOS">Todos os alunos</option>
+<option value="ATIVOS">Somente alunos ativos</option>
+<option value="ALUNO">Um aluno específico</option>
+</select></div>
+<div class="field hidden" id="alunoDestino"><label>Aluno</label><select name="alunoId">
+<option value="">Selecione um aluno</option>
+</select></div>
+</div>
+<div class="actions"><button class="btn primary" type="submit">Enviar notificação</button></div>
+</form>
+</div>
+<div class="card">
+<h2>HISTÓRICO DE NOTIFICAÇÕES</h2>
+<p>Nenhuma notificação enviada.</p>
+</div>
+<div class="card"><h3>Histórico — demonstração</h3><div class="item"><div><strong>Boas-vindas aos alunos</strong><small>Mensagem de boas-vindas após a matrícula.</small></div><span class="pill warn">TODOS</span></div></div></section>
+<dialog class="modal" id="alunoModal">
+<h2>DETALHES DO ALUNO</h2>
+<div id="alunoDetalhes"></div>
+<form action="#" data-demo="true" id="alunoDadosForm" method="post">
+<div class="grid">
+<div class="field"><label>Nome completo</label><input id="editAlunoNome" name="nome" required=""/>
+</div>
+<div class="field"><label>Celular</label><input id="editAlunoCelular" name="celular" required=""/>
+</div>
+<div class="field"><label>Data de nascimento</label><input id="editAlunoNascimento" name="dataNascimento" required="" type="date"/></div>
+<div class="field"><label>Cadastro facial</label><select id="editAlunoFacial" name="facial">
+<option value="PELO_APLICATIVO">Pelo aplicativo</option>
+<option value="PENDENTE">Pendente</option>
+<option value="CONCLUIDO">Concluído</option>
+</select></div>
+</div>
+<div class="actions"><button class="btn primary" type="submit">Salvar dados do aluno</button></div>
+</form>
+<div class="actions"><button class="btn" onclick="document.getElementById('alunoModal').close()">Fechar</button></div>
+</dialog>
+<dialog class="modal" id="planoModal">
+<h2 id="planoAlunoNome">ALTERAR PLANO</h2>
+<form action="#" data-demo="true" id="planoForm" method="post">
+<div class="grid">
+<div class="field"><label>Plano contratado</label><select id="planoNome" name="plano">
+<option>3 acessos por semana</option>
+<option>2 acessos por semana</option>
+<option>Acesso livre</option>
+</select></div>
+<div class="field"><label>Situação</label><select id="planoSituacao" name="situacao">
+<option value="AGUARDANDO">Aguardando pagamento</option>
+<option value="ATIVO">Ativo</option>
+<option value="VENCIDO">Vencido</option>
+<option value="SUSPENSO">Suspenso</option>
+<option value="CANCELADO">Cancelado</option>
+</select></div>
+<div class="field"><label>Vencimento</label><input id="planoVencimento" name="vencimento" type="date"/></div>
+</div>
+<div class="actions"><button class="btn primary" type="submit">Salvar situação</button></div>
+</form>
+<h3 style="margin-top:24px">REGISTRAR PAGAMENTO</h3>
+<form action="#" data-demo="true" id="pagamentoForm" method="post">
+<div class="grid">
+<div class="field"><label>Valor recebido (R$)</label><input max="100000" min="0.01" name="valor" required="" step="0.01" type="number"/></div>
+<div class="field"><label>Forma</label><select name="forma">
+<option value="DINHEIRO">Dinheiro</option>
+<option value="PIX">PIX</option>
+<option value="CARTAO">Cartão</option>
+<option value="TRANSFERENCIA">Transferência</option>
+</select></div>
+<div class="field"><label>Próximo vencimento</label><input name="vencimento" required="" type="date"/></div>
+</div>
+<div class="actions"><button class="btn primary" type="submit">Confirmar pagamento e
+                            ativar</button><button class="btn" onclick="document.getElementById('planoModal').close()" type="button">Fechar</button></div>
+</form>
+</dialog>
+</main>
+</div>
+<script>const sections=['visao','cadastrar','treinos','planos','notificacoes'];
+function showSection(id) {
+ if(!sections.includes(id))id='visao';
+ document.querySelectorAll('section.section').forEach(el=>el.classList.toggle('active',el.id===id));
+ document.querySelectorAll('a[data-section]').forEach(el=>el.classList.toggle('active',el.dataset.section===id));
+ history.replaceState(null,'','#'+id);
+ window.scrollTo(0,0);
+}
+document.querySelectorAll('a[data-section]').forEach(el=>el.addEventListener('click',e=>{e.preventDefault();showSection(el.dataset.section)}));
+window.addEventListener('hashchange',()=>showSection(location.hash.slice(1)));
+showSection(location.hash.slice(1));
+document.querySelectorAll('form[data-demo]').forEach(f=>f.addEventListener('submit',e=>{
+ e.preventDefault();alert('Demonstração: formulário preenchido. No sistema real, essa ação será processada pelo Spring Boot.');
+}));
+        function openAluno(btn) { const d = btn.dataset; const fields = [['Nome completo', d.nome], ['E-mail', d.email], ['Celular', d.celular], ['Data de nascimento', d.nascimento], ['Plano', d.plano], ['Situação do plano', d.situacao], ['Cadastro facial', d.facial], ['Vencimento', d.vencimento]]; const root = document.getElementById('alunoDetalhes'); root.replaceChildren(); fields.forEach(([label, value]) => { const p = document.createElement('p'); const b = document.createElement('strong'); b.textContent = label + ': '; p.append(b, document.createTextNode(value || 'Não informado')); root.append(p) }); document.getElementById('alunoDadosForm').action = '/admin/alunos/' + encodeURIComponent(d.id) + '/dados'; document.getElementById('editAlunoNome').value = d.nome || ''; document.getElementById('editAlunoCelular').value = d.celular || ''; document.getElementById('editAlunoNascimento').value = d.nascimento || ''; document.getElementById('editAlunoFacial').value = d.facial || 'PENDENTE'; document.getElementById('alunoModal').showModal() }
+        function openPlano(btn) { const d = btn.dataset; document.getElementById('planoAlunoNome').textContent = 'Plano de ' + d.nome; document.getElementById('planoForm').action = '/admin/alunos/' + encodeURIComponent(d.id) + '/plano'; document.getElementById('pagamentoForm').action = '/admin/alunos/' + encodeURIComponent(d.id) + '/pagamento'; document.getElementById('planoNome').value = d.plano || '3 acessos por semana'; document.getElementById('planoSituacao').value = d.situacao || 'AGUARDANDO'; document.getElementById('planoVencimento').value = d.vencimento || ''; document.getElementById('planoModal').showModal() }
+        function editModelo(btn) { const d = btn.dataset; document.getElementById('modeloId').disabled = false; document.getElementById('modeloId').value = d.id; document.getElementById('modeloNome').value = d.nome; document.getElementById('modeloDivisao').value = d.divisao; document.getElementById('modeloExercicios').value = d.exercicios; document.getElementById('modeloSubmit').textContent = 'Salvar alterações'; document.getElementById('modeloForm').scrollIntoView({ behavior: 'smooth', block: 'start' }) }
+        function resetModelo() { document.getElementById('modeloForm').reset(); document.getElementById('modeloId').disabled = true; document.getElementById('modeloSubmit').textContent = '+ Salvar modelo' }
+    </script><script>
+(function(){
+const links=[...document.querySelectorAll('.unified-sidebar [data-portal]')];
+function activate(id){links.forEach(a=>a.classList.toggle('uitem-active',a.dataset.portal===id))}
+links.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();const id=a.dataset.portal;if(typeof showSection==='function'){showSection(id);activate(id)}}));
+window.addEventListener('hashchange',()=>activate(location.hash.slice(1)));
+activate(location.hash.slice(1)||'visao');
+})();
+</script></body>
+</html>
