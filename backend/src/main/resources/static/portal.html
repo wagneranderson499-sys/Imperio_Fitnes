@@ -1593,8 +1593,7 @@
       </header>
       <main class="content">
         <section class="section active" id="inicio">
-          <div th:if="${param.welcome}" class="alert" style="margin-bottom:20px">Conta criada com sucesso! Bem-vindo(a),
-            <strong th:text="${aluno.nome}">Aluno</strong>. Seu painel está pronto.</div>
+          <div th:if="${param.welcome}" class="alert" style="margin-bottom:20px">Conta criada com sucesso! Sua jornada começa agora. Cada treino é uma oportunidade de evoluir. Estamos com você!</div>
           <div class="heading">
             <div>
               <div class="eyebrow">SEU ESPAÇO, SUA EVOLUÇÃO</div>
@@ -1648,7 +1647,7 @@
             <div>
               <div class="eyebrow">TREINAMENTO PERSONALIZADO</div>
               <h1>Meus treinos</h1><span class="muted">Sua ficha preparada pelo instrutor da academia.</span>
-            </div><span class="tag">Ficha ativa</span>
+            </div><span class="tag gray" id="routineStatus">Minha rotina</span>
           </div>
           <div class="card" style="margin-bottom:18px;border-color:#6b5424">
             <h2>Treinos atribuídos pela academia</h2>
@@ -1660,20 +1659,7 @@
                 th:text="${t.exercicios}">Exercícios</pre>
             </div>
           </div>
-          <div class="tabs" id="workTabs"></div>
-          <div class="grid">
-            <div class="card">
-              <div class="section-head" style="margin:0 0 10px">
-                <div>
-                  <h2 id="workTitle">Treino A</h2><span class="muted" id="workSubtitle">Peito e tríceps</span>
-                </div><span class="tag gold" id="workAmount">6 exercícios</span>
-              </div>
-              <div id="workExercises"></div>
-              <div class="actions"><button class="btn" onclick="finishWorkout()"><i data-lucide="check"></i> Concluir
-                  treino</button><button class="btn outline" onclick="navigate('biblioteca')">Biblioteca de
-                  exercícios</button></div>
-            </div>
-          </div>
+          <div id="routineList" class="grid"></div>
           <div class="extra-card" id="trainingBuilder">
             <div class="section-head" style="margin:0 0 12px">
               <div>
@@ -1688,23 +1674,6 @@
             </div>
             <div id="builderContent" style="margin-top:16px"></div>
           </div>
-          <div class="extra-card">
-            <div class="section-head" style="margin:0 0 12px">
-              <div>
-                <div class="eyebrow">CALENDÁRIO FLEXÍVEL</div>
-                <h2>Trocar dias de treino</h2>
-              </div><span class="tag gray">Dias conforme o plano · demonstração</span>
-            </div>
-            <p class="muted">Organize quais fichas pretende realizar em cada dia. Trocar a programação não devolve
-              acessos já utilizados.</p>
-            <div class="chiprow"><button class="chip selected" id="modeOnce" onclick="setScheduleMode('once')">Apenas
-                nesta semana</button><button class="chip" id="modeAlways" onclick="setScheduleMode('always')">Todas as
-                semanas</button></div>
-            <div class="chiprow" id="scheduleDays"></div>
-            <p class="muted-mini" id="scheduleHint"></p>
-            <div id="scheduleAssignments"></div>
-            <div class="actions"><button class="btn" onclick="saveSchedule()">Salvar programação</button></div>
-          </div>
         </section>
 
         <section class="section" id="biblioteca">
@@ -1716,9 +1685,8 @@
           </div>
           <div class="card"><input class="search" id="exerciseSearch" placeholder="Buscar exercício (ex.: agachamento)"
               oninput="renderLibrary()">
-            <div id="libraryList" style="margin-top:17px"></div>
-            <p class="small-note">As demonstrações são ilustrativas. Na versão real, os vídeos serão cadastrados e
-              revisados pelos profissionais da academia.</p>
+            <div id="libraryFilters" class="chiprow"></div><div id="libraryList" style="margin-top:17px"></div>
+            <p class="small-note">Imagens demonstrativas: Free Exercise DB. Consulte o instrutor para adequar a execução.</p>
           </div>
         </section>
         <section class="section" id="evolucao">
@@ -1972,10 +1940,10 @@
     let iconRefreshPending = false;
     const iconObserver = new MutationObserver(() => { if (iconRefreshPending) return; iconRefreshPending = true; requestAnimationFrame(() => { iconRefreshPending = false; refreshIcons() }) });
     document.addEventListener('DOMContentLoaded', () => { iconObserver.observe(document.body, { subtree: true, childList: true }); refreshIcons() });
-    function renderNav() { $('nav').innerHTML = sections.map(([id, ico, name]) => `<button class="nav ${current === id ? 'active' : ''}" onclick="navigate('${id}')"><span class="ico">${ico}</span>${name}${false ? '' : ''}</button>`).join(''); $('mobileBottom').innerHTML = [sections[0], sections[1], sections[3], sections[5], sections[8]].map(([id, ico, name]) => `<button class="${current === id ? 'active' : ''}" onclick="navigate('${id}')"><span>${ico}</span>${name.replace('Meus ', '').replace('Minha ', '').replace('Meu ', '')}</button>`).join('') }
+    function renderNav() { $('nav').innerHTML = sections.map(([id, ico, name]) => `<button class="nav ${current === id ? 'active' : ''}" onclick="navigate('${id}')"><span class="ico">${ico}</span>${name}${false ? '' : ''}</button>`).join(''); $('mobileBottom').innerHTML = [sections[0], sections[1], sections[3], sections[5], sections[7]].map(([id, ico, name]) => `<button class="${current === id ? 'active' : ''}" onclick="navigate('${id}')"><span>${ico}</span>${name.replace('Meus ', '').replace('Minha ', '').replace('Meu ', '')}</button>`).join('') }
     function navigate(id) { if (!$(id)) return; current = id; document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.id === id)); $('crumb').textContent = sections.find(x => x[0] === id)?.[2] || 'Início'; renderNav(); closeMenu(); window.scrollTo({ top: 0, behavior: 'instant' }); if (id === 'treinos') renderWorkout(); if (id === 'biblioteca') renderLibrary(); if (id === 'evolucao') renderProgress(); if (id === 'perfil') renderProfile(); if (id === 'notificacoes') renderNotifications(); }
     function toggleMenu() { $('sidebar').classList.toggle('open'); $('shade').classList.toggle('show') } function closeMenu() { $('sidebar').classList.remove('open'); $('shade').classList.remove('show') }
-    function updateHeader() { const first = state.name.split(' ')[0] || 'Aluno'; $('welcome').textContent = `Bem-vindo(a), ${first}!`; $('topGreeting').textContent = `Olá, ${first}`; $('sideName').textContent = state.name; $('profileName').textContent = state.name; $('statCount').textContent = state.count; $('heroCount').textContent = state.count; $('statPlan').textContent = state.plan; const av = state.photo ? `<img src="${state.photo}" alt="Foto de perfil">` : escapeHTML(state.name.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase()); $('topAvatar').innerHTML = av; $('profileAvatar').innerHTML = av; $('notDot').style.display = 'none' }
+    function updateHeader() { const first = state.name.split(' ')[0] || 'Aluno'; $('welcome').textContent = `Que bom ter você aqui, ${first}! Cada treino é uma oportunidade de evoluir. Vamos juntos conquistar seus objetivos!`; $('topGreeting').textContent = `Olá, ${first}`; $('sideName').textContent = state.name; $('profileName').textContent = state.name; $('statCount').textContent = state.count; $('heroCount').textContent = state.count; $('statPlan').textContent = state.plan; const av = state.photo ? `<img src="${state.photo}" alt="Foto de perfil">` : escapeHTML(state.name.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase()); $('topAvatar').innerHTML = av; $('profileAvatar').innerHTML = av; $('notDot').style.display = 'none' }
     function renderWeek() { if (!$('week')) return; $('week').innerHTML = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'].map((d, i) => `<div class="day ${[0, 2, 4].includes(i) ? 'done' : ''} ${i === 4 ? 'today' : ''}">${d}<b>${[0, 2, 4].includes(i) ? '<i data-lucide="check"></i>' : '–'}</b></div>`).join('') }
     function renderWorkout() { const w = workouts[workIndex]; $('workTabs').innerHTML = workouts.map((x, i) => `<button class="tab ${i === workIndex ? 'active' : ''}" onclick="workIndex=${i};renderWorkout()">${x.name}</button>`).join(''); $('workTitle').textContent = w.name; $('workSubtitle').textContent = w.sub; $('workAmount').textContent = w.ex.length + ' exercícios'; $('heroWorkout').textContent = w.name + ' · ' + w.sub + ' · ' + w.ex.length + ' exercícios'; $('workExercises').innerHTML = w.ex.map((x, i) => `<div class="exercise"><div class="thumb"><img loading="lazy" decoding="async" alt="Equipamentos e treinamento" src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=180&q=68"></div><div class="info"><strong>${escapeHTML(x)}</strong><small>3 séries · 12 repetições · 60s descanso</small></div><button onclick="openExercise('${escapeHTML(x)}')">Ver exercício</button><input type="checkbox" title="Marcar exercício" style="width:18px;height:18px;accent-color:#c89c3e" ${state.done[w.name + '-' + x] ? 'checked' : ''} onchange="state.done['${w.name}-${x}']=this.checked;persist();renderWorkout()"></div>`).join(''); const done = w.ex.filter(x => state.done[w.name + '-' + x]).length; }
     function openExercise(name) { openModal(name, 'Orientações de execução para consulta. Peça supervisão de um profissional quando necessário.', `<div class="video-placeholder"><i data-lucide="play"></i></div><div class="alert">Demonstração em vídeo: espaço reservado para conteúdo do instrutor.</div><p style="margin-top:15px">${escapeHTML(instructions[name] || 'Execute o movimento com controle, postura adequada e orientação do instrutor.')}</p><p class="small-note">Séries: 3 · Repetições: 12 · Descanso: 60 segundos (exemplo)</p>`) }
@@ -1993,7 +1961,7 @@
     function renderBenefits() { }
     function changePlan() { state.plan = $('newPlan').value; persist(); updateHeader(); closeModal(); toast('Troca simulada! Nenhum contrato ou cobrança foi alterado.') } function requestCancel() { closeModal(); toast('Solicitação demonstrativa registrada apenas nesta tela.') } function sendSupport() { const msg = $('supportText').value.trim(); if (msg.length < 5) return toast('Escreva uma mensagem com pelo menos 5 caracteres.'); state.support.push({ topic: $('supportTopic').value, message: msg }); persist(); $('supportText').value = ''; toast('Mensagem salva localmente. Não foi enviada à academia.') }
     function openModal(title, desc, body) { $('modalTitle').textContent = title; $('modalDesc').textContent = desc; $('modalBody').innerHTML = body; $('modalBg').classList.add('show') } function closeModal() { $('modalBg').classList.remove('show') } function resetDemo() { if (!confirm('Restaurar todos os dados demonstrativos?')) return; state = structuredClone(initial); persist(); location.reload() }
-    renderNav(); renderWorkout(); renderLibrary(); renderProgress(); renderNotifications(); renderBenefits(); renderProfile(); updateHeader();
+    renderNav(); renderProgress(); renderNotifications(); renderBenefits(); renderProfile(); updateHeader();
 
     // Complementos: preservam todas as seções e rotinas do protótipo original.
     const templateCatalog = [{ name: 'Peito e ombros', items: ['Supino reto', 'Supino inclinado', 'Desenvolvimento militar', 'Elevação lateral'] }, { name: 'Costas e bíceps', items: ['Puxada frontal', 'Remada baixa', 'Rosca direta', 'Rosca martelo'] }, { name: 'Pernas completo', items: ['Agachamento livre', 'Leg press', 'Cadeira extensora', 'Mesa flexora'] }, { name: 'Cardio e core', items: ['Esteira', 'Prancha', 'Abdominal crunch', 'Bicicleta ergométrica'] }, { name: 'ABC — Iniciante', items: ['Supino reto', 'Puxada frontal', 'Agachamento livre'] }, { name: 'Superiores — Iniciante', items: ['Supino reto', 'Remada baixa', 'Rosca direta'] }, { name: 'Inferiores — Iniciante', items: ['Agachamento livre', 'Leg press', 'Mesa flexora'] }, { name: 'Funcional', items: ['Agachamento livre', 'Flexão de braço'] }, { name: 'Glúteos', items: ['Elevação pélvica', 'Agachamento livre', 'Leg press'] }];
@@ -2027,6 +1995,38 @@
     const originalNavigate = navigate;
     navigate = function (id) { if (state.expired && !['plano', 'suporte', 'perfil', 'notificacoes'].includes(id)) { $('expiredCover').classList.add('visible'); return } originalNavigate(id); if (id === 'treinos') renderSchedule(); if (id === 'perfil') renderPrefs(); if (id === 'plano') { renderExpiry(); renderPause() } };
     renderSchedule(); renderPrefs(); renderPause(); renderExpiry();
+
+    const catalogV3 = [{"name":"Supino reto","id":"Barbell_Bench_Press_-_Medium_Grip","group":"Peito"},{"name":"Supino inclinado","id":"Barbell_Incline_Bench_Press_-_Medium_Grip","group":"Peito"},{"name":"Supino com halteres","id":"Dumbbell_Bench_Press","group":"Peito"},{"name":"Supino declinado","id":"Decline_Barbell_Bench_Press","group":"Peito"},{"name":"Crucifixo","id":"Dumbbell_Flyes","group":"Peito"},{"name":"Crucifixo inclinado","id":"Incline_Dumbbell_Flyes","group":"Peito"},{"name":"Crossover","id":"Cable_Crossover","group":"Peito"},{"name":"Flexão de braço","id":"Pushups","group":"Peito"},{"name":"Flexão inclinada","id":"Incline_Push-Up","group":"Peito"},{"name":"Supino máquina","id":"Machine_Bench_Press","group":"Peito"},{"name":"Crossover baixo","id":"Low_Cable_Crossover","group":"Peito"},{"name":"Puxada frontal","id":"Wide-Grip_Lat_Pulldown","group":"Costas"},{"name":"Remada baixa","id":"Seated_Cable_Rows","group":"Costas"},{"name":"Remada unilateral","id":"One-Arm_Dumbbell_Row","group":"Costas"},{"name":"Remada curvada","id":"Bent_Over_Barbell_Row","group":"Costas"},{"name":"Remada cavalinho","id":"Bent_Over_Two-Arm_Long_Bar_Row","group":"Costas"},{"name":"Puxada neutra","id":"V-Bar_Pulldown","group":"Costas"},{"name":"Barra fixa","id":"Pullups","group":"Costas"},{"name":"Pulldown braços retos","id":"Straight-Arm_Pulldown","group":"Costas"},{"name":"Agachamento livre","id":"Barbell_Full_Squat","group":"Pernas"},{"name":"Leg press","id":"Leg_Press","group":"Pernas"},{"name":"Cadeira extensora","id":"Leg_Extensions","group":"Pernas"},{"name":"Mesa flexora","id":"Lying_Leg_Curls","group":"Pernas"},{"name":"Hack squat","id":"Hack_Squat","group":"Pernas"},{"name":"Agachamento frontal","id":"Front_Barbell_Squat","group":"Pernas"},{"name":"Agachamento goblet","id":"Goblet_Squat","group":"Pernas"},{"name":"Stiff","id":"Stiff-Legged_Barbell_Deadlift","group":"Pernas"},{"name":"Levantamento terra romeno","id":"Romanian_Deadlift","group":"Pernas"},{"name":"Afundo","id":"Dumbbell_Rear_Lunge","group":"Pernas"},{"name":"Elevação pélvica","id":"Barbell_Hip_Thrust","group":"Glúteos"},{"name":"Cadeira abdutora","id":"Thigh_Abductor","group":"Glúteos"},{"name":"Glúteo no cabo","id":"One-Legged_Cable_Kickback","group":"Glúteos"},{"name":"Coice","id":"Glute_Kickback","group":"Glúteos"},{"name":"Rosca direta","id":"Barbell_Curl","group":"Bíceps"},{"name":"Rosca martelo","id":"Hammer_Curls","group":"Bíceps"},{"name":"Rosca alternada","id":"Dumbbell_Alternate_Bicep_Curl","group":"Bíceps"},{"name":"Rosca Scott","id":"Preacher_Curl","group":"Bíceps"},{"name":"Rosca concentrada","id":"Concentration_Curls","group":"Bíceps"},{"name":"Rosca inclinada","id":"Incline_Dumbbell_Curl","group":"Bíceps"},{"name":"Tríceps pulley","id":"Triceps_Pushdown","group":"Tríceps"},{"name":"Tríceps francês","id":"Standing_Dumbbell_Triceps_Extension","group":"Tríceps"},{"name":"Tríceps corda","id":"Triceps_Pushdown_-_Rope_Attachment","group":"Tríceps"},{"name":"Tríceps testa","id":"Lying_Triceps_Press","group":"Tríceps"},{"name":"Paralelas","id":"Dips_-_Triceps_Version","group":"Tríceps"},{"name":"Tríceps coice","id":"Tricep_Dumbbell_Kickback","group":"Tríceps"},{"name":"Desenvolvimento com halteres","id":"Dumbbell_Shoulder_Press","group":"Ombros"},{"name":"Elevação lateral","id":"Side_Lateral_Raise","group":"Ombros"},{"name":"Elevação frontal","id":"Front_Dumbbell_Raise","group":"Ombros"},{"name":"Crucifixo inverso","id":"Cable_Rear_Delt_Fly","group":"Ombros"},{"name":"Panturrilha em pé","id":"Standing_Calf_Raises","group":"Panturrilha"},{"name":"Panturrilha sentada","id":"Seated_Calf_Raise","group":"Panturrilha"},{"name":"Panturrilha no leg press","id":"Calf_Press_On_The_Leg_Press_Machine","group":"Panturrilha"},{"name":"Prancha","id":"Plank","group":"Abdômen"},{"name":"Abdominal crunch","id":"Crunches","group":"Abdômen"},{"name":"Elevação de pernas","id":"Hanging_Leg_Raise","group":"Abdômen"},{"name":"Abdominal na polia","id":"Cable_Crunch","group":"Abdômen"},{"name":"Abdominal declinado","id":"Decline_Crunch","group":"Abdômen"},{"name":"Esteira","id":"Jogging_Treadmill","group":"Cardio"},{"name":"Bicicleta ergométrica","id":"Bicycling_Stationary","group":"Cardio"},{"name":"Elíptico","id":"Elliptical_Trainer","group":"Cardio"},{"name":"Escada","id":"Stairmaster","group":"Cardio"},{"name":"Pular corda","id":"Rope_Jumping","group":"Cardio"}];
+    const daysV3 = ['Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado','Domingo'];
+    let filterV3='Todos', draftV3=null, editV3=-1;
+    const limitV3=()=>{const p=String(state.plan||'').toLowerCase();const m=p.match(/([1-7])\s*(?:x|dias)/);return m?Number(m[1]):/full|livre|ilimitado|premium/.test(p)?7:0};
+    const imageV3=(e,n=0)=>'https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/'+encodeURIComponent(e.id)+'/'+n+'.jpg';
+    const picV3=e=>'<img loading="lazy" alt="'+escapeHTML(e.name)+'" src="'+imageV3(e)+'" style="width:100%;height:100%;object-fit:contain;background:white" onerror="this.hidden=true">';
+    const entryV3=id=>({id,sets:3,reps:12,kg:0,rest:60});
+    const findV3=id=>catalogV3.find(e=>e.id===id);
+    const normV3=x=>String(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+    state.routineV3=Array.isArray(state.routineV3)?state.routineV3:[];
+    function visibleRoutineV3(){return state.routineV3.filter(w=>Number.isInteger(w.day)&&w.day>=0&&w.day<7).sort((a,b)=>a.day-b.day).slice(0,limitV3())}
+    renderWorkout=function(){
+      const limit=limitV3(), rows=visibleRoutineV3();
+      $('routineStatus').textContent=rows.length?'Ficha pessoal ativa':'Sem ficha pessoal';
+      $('routineList').innerHTML='<p class="muted">'+(limit?'Seu plano permite '+limit+' dias por semana.':'Plano não identificado. Confirme sua matrícula para criar uma rotina.')+'</p>'+ (rows.length?rows.map(w=>{const i=state.routineV3.indexOf(w);return '<div class="card"><div class="eyebrow">'+daysV3[w.day]+'</div><h2>'+escapeHTML(w.name)+'</h2>'+w.items.map((item,j)=>{const e=findV3(item.id);return e?'<div class="exercise"><div class="thumb" style="width:105px;height:85px">'+picV3(e)+'</div><div class="info"><strong>'+escapeHTML(e.name)+'</strong><small>'+item.sets+' séries · '+item.reps+' repetições · '+item.kg+' kg · '+item.rest+'s descanso</small></div><button onclick="detailV3('+catalogV3.indexOf(e)+')">Ver</button></div>':''}).join('')+'<div class="actions"><button class="btn" onclick="completeV3('+i+')">Concluir treino</button><button class="btn outline" onclick="editRoutineV3('+i+')">Editar</button><button class="btn outline" onclick="deleteRoutineV3('+i+')">Excluir</button></div></div>'}).join(''):'<div class="card">Nenhuma ficha pessoal criada. Escolha um modelo ou crie sua rotina abaixo.</div>');
+      const hero=$('heroWorkout');if(hero)hero.textContent=rows.length?rows[0].name:'Monte sua rotina de treino';
+    };
+    function completeV3(i){if(!state.routineV3[i]||!confirm('Registrar treino concluído neste navegador?'))return;state.count++;persist();updateHeader();toast('Treino concluído! Parabéns pela dedicação.')}
+    function deleteRoutineV3(i){if(confirm('Excluir esta ficha pessoal?')){state.routineV3.splice(i,1);persist();renderWorkout()}}
+    function detailV3(i){const e=catalogV3[i];if(!e)return;openModal(e.name,e.group+' · Demonstração do movimento','<div class="grid g2"><img style="width:100%;background:white" src="'+imageV3(e)+'" alt="Posição inicial"><img style="width:100%;background:white" src="'+imageV3(e,1)+'" alt="Posição final" onerror="this.hidden=true"></div><p>Execute com controle e orientação do instrutor.</p><button class="btn" onclick="addFromLibraryV3('+i+')">Adicionar ao meu treino</button>')}
+    renderLibrary=function(){const q=normV3($('exerciseSearch').value||'');$('libraryFilters').innerHTML=['Todos',...new Set(catalogV3.map(e=>e.group))].map(g=>'<button class="chip '+(filterV3===g?'selected':'')+'" onclick="filterV3='+ "'" +g+ "'" +';renderLibrary()">'+g+'</button>').join('');$('libraryList').innerHTML='<div class="template-grid">'+catalogV3.filter(e=>(filterV3==='Todos'||e.group===filterV3)&&normV3(e.name).includes(q)).map(e=>'<div class="template"><div style="height:145px;background:white;border-radius:9px;overflow:hidden">'+picV3(e)+'</div><strong style="margin-top:10px">'+escapeHTML(e.name)+'</strong><small>'+e.group+'</small><div class="actions"><button class="btn outline sm" onclick="detailV3('+catalogV3.indexOf(e)+')">Ver exercício</button></div></div>').join('')+'</div>'};
+    function addFromLibraryV3(i){closeModal();navigate('treinos');if(!draftV3)showBuilder('custom');if(draftV3){if(!draftV3.items.some(x=>x.id===catalogV3[i].id))draftV3.items.push(entryV3(catalogV3[i].id));drawDraftV3()}}
+    showBuilder=function(mode){if(!limitV3())return toast('Confirme um plano de treino antes de criar sua ficha.');editV3=-1;draftV3={name:'',day:-1,items:[]};if(mode==='templates'){ $('builderContent').innerHTML='<h3>Escolha um grupo muscular</h3><div class="chiprow">'+[...new Set(catalogV3.map(e=>e.group))].map(g=>'<button class="chip" onclick="modelV3('+ "'" +g+ "'" +')">'+g+'</button>').join('')+'</div>';return}drawDraftV3()};
+    function modelV3(g){draftV3.name=g;draftV3.items=catalogV3.filter(e=>e.group===g).slice(0,4).map(e=>entryV3(e.id));drawDraftV3()}
+    function editRoutineV3(i){editV3=i;draftV3=structuredClone(state.routineV3[i]);drawDraftV3();$('trainingBuilder').scrollIntoView({behavior:'smooth'})}
+    function drawDraftV3(){if(!draftV3)return;const used=state.routineV3.filter((w,i)=>i!==editV3).map(w=>w.day);$('builderContent').innerHTML='<div class="field"><label>Nome do treino</label><input value="'+escapeHTML(draftV3.name)+'" oninput="draftV3.name=this.value"></div><div class="field"><label>Dia da semana</label><select onchange="draftV3.day=Number(this.value)"><option value="-1">Selecione</option>'+daysV3.map((d,i)=>'<option value="'+i+'" '+(draftV3.day===i?'selected':'')+' '+(used.includes(i)?'disabled':'')+'>'+d+'</option>').join('')+'</select></div><h3 style="margin-top:18px">Adicionar exercícios</h3><div class="field"><select id="draftPickV3">'+catalogV3.map((e,i)=>'<option value="'+i+'">'+escapeHTML(e.group+' — '+e.name)+'</option>').join('')+'</select></div><button class="btn outline" onclick="pickV3()">Adicionar</button>'+draftV3.items.map((x,i)=>{const e=findV3(x.id);return '<div class="card" style="margin-top:12px"><div class="exercise"><div class="thumb">'+picV3(e)+'</div><strong>'+escapeHTML(e.name)+'</strong></div><div class="formgrid">'+[['sets','Séries',1],['reps','Repetições',1],['kg','Carga (kg)',0],['rest','Descanso (s)',0]].map(([k,label,min])=>'<div class="field"><label>'+label+'</label><input type="number" min="'+min+'" value="'+x[k]+'" onchange="draftV3.items['+i+'].'+k+'=Number(this.value)"></div>').join('')+'</div><div class="actions"><button class="btn outline sm" onclick="moveV3('+i+',-1)">Subir</button><button class="btn outline sm" onclick="moveV3('+i+',1)">Descer</button><button class="btn outline sm" onclick="draftV3.items.splice('+i+',1);drawDraftV3()">Remover</button></div></div>'}).join('')+'<div class="actions"><button class="btn" onclick="saveV3()">Salvar treino</button></div><p class="small-note">Ficha pessoal salva neste navegador. Não altera a ficha oficial.</p>'}
+    function pickV3(){const e=catalogV3[Number($('draftPickV3').value)];if(e&&!draftV3.items.some(x=>x.id===e.id)){draftV3.items.push(entryV3(e.id));drawDraftV3()}}
+    function moveV3(i,d){const j=i+d;if(j<0||j>=draftV3.items.length)return;[draftV3.items[i],draftV3.items[j]]=[draftV3.items[j],draftV3.items[i]];drawDraftV3()}
+    function saveV3(){if(!draftV3.name.trim()||draftV3.day<0||draftV3.day>6||!draftV3.items.length)return toast('Informe nome, dia e exercícios.');if(state.routineV3.some((w,i)=>i!==editV3&&w.day===draftV3.day))return toast('Este dia já tem treino.');if(editV3<0&&state.routineV3.length>=limitV3())return toast('Limite de dias do plano atingido.');if(draftV3.items.some(x=>!Number.isInteger(x.sets)||x.sets<1||!Number.isInteger(x.reps)||x.reps<1||!Number.isFinite(x.kg)||x.kg<0||!Number.isFinite(x.rest)||x.rest<0))return toast('Confira séries, repetições, carga e descanso.');if(editV3<0)state.routineV3.push(draftV3);else state.routineV3[editV3]=draftV3;persist();draftV3=null;$('builderContent').innerHTML='';renderWorkout();toast('Ficha pessoal salva!')}
+    renderWorkout();renderLibrary();
+
   </script>
 </body>
 
