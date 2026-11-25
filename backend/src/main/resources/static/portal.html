@@ -1934,7 +1934,7 @@
     const SERVER_ALUNO = { name: /*[[${aluno.nome}]]*/ "Aluno", email: /*[[${aluno.email}]]*/ "", phone: /*[[${aluno.celular}]]*/ "", birth: /*[[${aluno.dataNascimento}]]*/ "", plan: /*[[${aluno.planoAtual}]]*/ "" };
     const initial = { name: 'Aluno', email: '', phone: '', birth: '', photo: '', plan: 'Plano Full', count: 12, done: {}, loads: [], goals: [{ title: 'Treinar 3 vezes na semana', value: 2, target: 3 }, { title: 'Completar 15 treinos no mês', value: 12, target: 15 }], read: false, support: [] };
     Object.assign(initial, { name: SERVER_ALUNO.name, email: SERVER_ALUNO.email, phone: SERVER_ALUNO.phone || '', birth: SERVER_ALUNO.birth || '', plan: SERVER_ALUNO.plan || 'Aguardando matrícula', count: 0, done: {}, loads: [], goals: [], read: false });
-    const storageKey = 'imperio_aluno_demo_v2_' + SERVER_ALUNO.email;
+    let storageKey = 'imperio_aluno_demo_v2_' + SERVER_ALUNO.email;
     function loadState() { try { return { ...structuredClone(initial), ...JSON.parse(localStorage.getItem(storageKey) || '{}'), name: SERVER_ALUNO.name, email: SERVER_ALUNO.email, phone: SERVER_ALUNO.phone || '', birth: SERVER_ALUNO.birth || '', plan: SERVER_ALUNO.plan || 'Aguardando matrícula' } } catch { return structuredClone(initial) } } let state = loadState(), workIndex = 0, current = 'inicio'; const $ = id => document.getElementById(id); function persist() { try { localStorage.setItem(storageKey, JSON.stringify(state)) } catch { toast('Armazenamento indisponível neste navegador.') } } function escapeHTML(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])) } function toast(msg) { $('toast').textContent = msg; $('toast').classList.add('show'); clearTimeout(window._tt); window._tt = setTimeout(() => $('toast').classList.remove('show'), 3500) }
     function refreshIcons() { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 2 } }) }
     let iconRefreshPending = false;
@@ -2026,6 +2026,37 @@
     function moveV3(i,d){const j=i+d;if(j<0||j>=draftV3.items.length)return;[draftV3.items[i],draftV3.items[j]]=[draftV3.items[j],draftV3.items[i]];drawDraftV3()}
     function saveV3(){if(!draftV3.name.trim()||draftV3.day<0||draftV3.day>6||!draftV3.items.length)return toast('Informe nome, dia e exercícios.');if(state.routineV3.some((w,i)=>i!==editV3&&w.day===draftV3.day))return toast('Este dia já tem treino.');if(editV3<0&&state.routineV3.length>=limitV3())return toast('Limite de dias do plano atingido.');if(draftV3.items.some(x=>!Number.isInteger(x.sets)||x.sets<1||!Number.isInteger(x.reps)||x.reps<1||!Number.isFinite(x.kg)||x.kg<0||!Number.isFinite(x.rest)||x.rest<0))return toast('Confira séries, repetições, carga e descanso.');if(editV3<0)state.routineV3.push(draftV3);else state.routineV3[editV3]=draftV3;persist();draftV3=null;$('builderContent').innerHTML='';renderWorkout();toast('Ficha pessoal salva!')}
     renderWorkout();renderLibrary();
+
+    let modelsRealV3=[];
+    const originalBuilderV3=showBuilder;
+    let accountReadyV3=fetch('/portal/dados',{headers:{Accept:'application/json'}}).then(async r=>{
+      if(!r.ok||!r.headers.get('content-type')?.includes('application/json'))throw Error('Sessão indisponível');
+      const a=await r.json();Object.assign(SERVER_ALUNO,a);
+      storageKey='imperio_aluno_demo_v2_'+a.email;state=loadState();
+      for(const [k,v] of Object.entries(defaultsExtra))if(state[k]===undefined)state[k]=structuredClone(v);
+      state.routineV3=Array.isArray(state.routineV3)?state.routineV3:[];
+      updateHeader();renderProfile();renderWorkout();return true;
+    }).catch(()=>false);
+    showBuilder=async function(mode){
+      const el=$('builderContent');
+      if(mode!=='templates'){await accountReadyV3;return originalBuilderV3(mode)}
+      el.innerHTML='<p class="muted">Carregando modelos da academia...</p>';
+      try{
+        const r=await fetch('/portal/modelos',{headers:{Accept:'application/json'},cache:'no-store'});
+        if(!r.ok||!r.headers.get('content-type')?.includes('application/json'))throw Error('Sessão indisponível');
+        modelsRealV3=await r.json();
+        el.innerHTML=modelsRealV3.length?'<h3>Modelos cadastrados pela academia</h3>'+modelsRealV3.map((m,i)=>'<div class="card" style="margin-top:12px"><h3>'+escapeHTML(m.nome)+'</h3><span class="tag gold">'+escapeHTML(m.divisao)+'</span><pre style="white-space:pre-wrap;font:inherit">'+escapeHTML(m.exercicios)+'</pre><button class="btn" onclick="selectRealModelV3('+i+')">Personalizar modelo</button></div>').join(''):'<p class="muted">Nenhum modelo cadastrado pela academia ainda.</p>';
+      }catch(e){el.innerHTML='<p class="muted">Não foi possível carregar os modelos. Entre na sua conta pelo sistema e tente novamente.</p>'}
+    };
+    async function selectRealModelV3(i){
+      await accountReadyV3;const m=modelsRealV3[i];if(!m)return;
+      if(!limitV3())return toast('Confirme seu plano antes de personalizar.');
+      editV3=-1;const lines=String(m.exercicios||'').split(/\r?\n|;/);
+      const items=[];const unmatched=[];
+      for(const line of lines){if(!line.trim())continue;const e=[...catalogV3].sort((a,b)=>b.name.length-a.name.length).find(e=>normV3(line).includes(normV3(e.name)));if(!e){unmatched.push(line);continue}if(items.some(x=>x.id===e.id))continue;const x=entryV3(e.id);const reps=line.match(/(\d+)\s*[x×]\s*(\d+)/i);if(reps){x.sets=Number(reps[1]);x.reps=Number(reps[2])}items.push(x)}
+      draftV3={name:m.nome,day:-1,items};drawDraftV3();
+      const note=document.createElement('p');note.className='small-note';note.textContent='Modelo original: '+m.exercicios+(unmatched.length?' | Confira os exercícios não reconhecidos e adicione equivalentes manualmente.':'');$('builderContent').prepend(note);
+    }
 
   </script>
 </body>
