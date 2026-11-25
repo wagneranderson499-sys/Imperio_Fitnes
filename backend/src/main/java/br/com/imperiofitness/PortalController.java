@@ -28,8 +28,9 @@ public class PortalController {
  private final TreinoAtribuidoRepository treinos;
  private final NotificacaoRepository notificacoes;
  private final PagamentoRepository pagamentos;
- public PortalController(AlunoRepository alunos,MatriculaRepository matriculas,PasswordEncoder encoder,TreinoAtribuidoRepository treinos,NotificacaoRepository notificacoes,PagamentoRepository pagamentos){
-  this.alunos=alunos;this.matriculas=matriculas;this.encoder=encoder;this.treinos=treinos;this.notificacoes=notificacoes;this.pagamentos=pagamentos;
+ private final TreinoModeloRepository modelos;
+ public PortalController(AlunoRepository alunos,MatriculaRepository matriculas,PasswordEncoder encoder,TreinoAtribuidoRepository treinos,NotificacaoRepository notificacoes,PagamentoRepository pagamentos,TreinoModeloRepository modelos){
+  this.alunos=alunos;this.matriculas=matriculas;this.encoder=encoder;this.treinos=treinos;this.notificacoes=notificacoes;this.pagamentos=pagamentos;this.modelos=modelos;
  }
  @GetMapping("/ativar-conta")
  public String ativacao(@RequestParam(defaultValue="") String token,Model model){
@@ -107,6 +108,18 @@ public class PortalController {
   model.addAttribute("notificacoesAluno",!Boolean.FALSE.equals(aluno.notificacoesAtivas)?notificacoes.paraAluno(aluno.id,"ATIVO".equals(aluno.situacaoPlano)):java.util.List.of());
   model.addAttribute("pagamentosAluno",pagamentos.findByAlunoIdOrderByRegistradoEmDesc(aluno.id));
   return "portal";
+ }
+ @GetMapping("/portal/modelos")
+ @ResponseBody
+ public java.util.List<TreinoModelo> modelos(Principal principal){
+  alunos.findByEmailIgnoreCase(principal.getName()).orElseThrow();
+  return modelos.findAll();
+ }
+ @GetMapping("/portal/dados")
+ @ResponseBody
+ public java.util.Map<String,String> dados(Principal principal){
+  Aluno a=alunos.findByEmailIgnoreCase(principal.getName()).orElseThrow();
+  return java.util.Map.of("name",a.nome,"email",a.email,"phone",java.util.Objects.toString(a.celular,""),"birth",java.util.Objects.toString(a.dataNascimento,""),"plan",java.util.Objects.toString(a.planoAtual,""),"status",java.util.Objects.toString(a.situacaoPlano,""));
  }
  @PostMapping("/portal/matriculas")
  public String matricular(Principal principal,@RequestParam String plano,RedirectAttributes redirect,HttpSession session){
