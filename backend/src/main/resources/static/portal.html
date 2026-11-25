@@ -1726,41 +1726,10 @@
         </section>
 
         <section class="section" id="plano">
-          <div class="card" style="margin-bottom:18px">
-            <h2>Meu plano atual</h2>
-            <p>Plano: <strong th:text="${aluno.planoAtual} ?: 'Aguardando definição'">Plano</strong></p>
-            <p>Situação: <strong th:text="${aluno.situacaoPlano}">AGUARDANDO</strong></p>
-            <p>Vencimento: <strong th:text="${aluno.vencimentoPlano} ?: 'Não informado'">Vencimento</strong></p>
-            <h3>Pagamentos registrados</h3>
-            <p class="muted" th:if="${#lists.isEmpty(pagamentosAluno)}">Nenhum pagamento registrado.</p>
-            <div th:each="p : ${pagamentosAluno}" class="mini-row"><span th:text="${p.forma}">Forma</span><strong
-                th:text="${p.valor}">Valor</strong><small
-                th:text="${#temporals.format(p.registradoEm,'dd/MM/yyyy')}">Data</small></div>
-          </div>
-          <div class="card" style="margin-bottom:20px;border-color:#665222">
-            <h3>Gerenciar minha assinatura</h3>
-            <p class="small-note">Ações abaixo são solicitações demonstrativas; não alteram pagamentos ou contratos.</p>
-            <div class="actions"><button class="btn"
-                onclick="openModal('Matrícula','Escolha um plano para iniciar sua matrícula.','<p>Solicitação disponível após integração com o backend.</p>')">Quero
-                me matricular</button><button class="btn outline"
-                onclick="openModal('Troca de plano','Solicite uma alteração de plano.','<p>A troca depende da confirmação da academia.</p>')">Trocar
-                plano</button><button class="btn danger"
-                onclick="openModal('Cancelar plano','O cancelamento depende da confirmação da academia.','<button class=&quot;btn danger&quot; onclick=&quot;requestCancel()&quot;>Solicitar cancelamento</button>')">Cancelar
-                plano</button></div>
-            <div class="eyebrow">SINCRONIZADO COM A ACADEMIA</div>
-            <h2>Minhas matrículas</h2>
-            <p class="muted">Acompanhe o andamento das solicitações analisadas pela administração.</p>
-            <p th:if="${#lists.isEmpty(matriculas)}" class="muted">Você ainda não possui solicitações de matrícula.</p>
-            <div th:each="m : ${matriculas}"
-              style="display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #37373b;padding:13px 0">
-              <div><strong th:text="${m.plano}">Plano solicitado</strong>
-                <div class="muted" style="font-size:12px" th:text="${#temporals.format(m.criadaEm,'dd/MM/yyyy')}">Data
-                </div>
-              </div>
-              <span class="tag gold" th:text="${m.status}">PENDENTE</span>
-            </div>
-          </div>
-        </section>
+<div class="heading"><div><div class="eyebrow">MINHA ASSINATURA</div><h1>Meu plano</h1><span class="muted">Gerencie sua matrícula e pagamentos.</span></div><span class="tag gold">DEMONSTRAÇÃO</span></div>
+<div class="alert" style="margin-bottom:18px">Ambiente de apresentação: nenhum pagamento real será realizado.</div>
+<div id="planDemoV4"></div>
+</section>
 
         <section class="section" id="notificacoes">
           <div class="heading">
@@ -2058,7 +2027,40 @@
       const note=document.createElement('p');note.className='small-note';note.textContent='Modelo original: '+m.exercicios+(unmatched.length?' | Confira os exercícios não reconhecidos e adicione equivalentes manualmente.':'');$('builderContent').prepend(note);
     }
 
-  </script>
+  
+    const plansV4=[{name:'Plano 3x por semana',price:89.90,desc:'Até três dias de treino por semana'},{name:'Plano Full',price:119.90,desc:'Acesso livre durante a semana'}];
+    const moneyV4=n=>Number(n).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+    const dateV4=d=>d?new Date(d+'T12:00:00').toLocaleDateString('pt-BR'):'Não informado';
+    const todayV4=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+    let selectedPlanV4=0,methodV4='PIX';
+    function subscriptionV4(){return state.subscriptionV4||{status:'none',history:[]}}
+    function syncPlanV4(){const p=subscriptionV4();if(p.status==='active'&&p.due<todayV4())p.status='expired';if(p.status!=='none'){state.plan=p.status==='active'?p.name:'Aguardando matrícula';state.expired=p.status==='expired';persist();updateHeader()}}
+    function renderPlanV4(){syncPlanV4();const p=subscriptionV4(),el=$('planDemoV4');if(!el)return;const active=p.status==='active',expired=p.status==='expired',pending=p.status==='pending';const labels={none:'Sem plano ativo',active:'Ativo',expired:'Vencido',pending:'Aguardando pagamento',cancelled:'Cancelado'};
+      let html='<div class="card" style="margin-bottom:18px"><span class="tag '+(active?'gold':'gray')+'">'+labels[p.status]+'</span><h2 style="margin-top:12px">'+escapeHTML(p.name||'Escolha seu plano')+'</h2>';
+      if(p.name)html+='<div class="mini-row"><span>Valor mensal</span><strong>'+moneyV4(p.price)+'</strong></div><div class="mini-row"><span>Último pagamento</span><strong>'+dateV4(p.paid)+'</strong></div><div class="mini-row"><span>Vencimento</span><strong>'+dateV4(p.due)+'</strong></div><div class="mini-row"><span>Forma de pagamento</span><strong>'+escapeHTML(p.method||'—')+'</strong></div>';
+      if(active)html+='<div class="actions"><button class="btn danger" onclick="cancelPlanV4()">Cancelar plano</button><button class="btn outline" onclick="expirePlanV4()">Simular vencimento</button></div>';
+      if(expired)html+='<p class="muted">Renove seu último plano ou escolha outro abaixo.</p><button class="btn" onclick="checkoutV4('+Math.max(0,plansV4.findIndex(x=>x.name===p.name))+')">Atualizar pagamento</button>';
+      if(pending)html+='<p>Dirija-se à recepção para pagar em dinheiro. O plano só será ativado após confirmação.</p><div class="actions"><button class="btn" onclick="confirmCashV4()">Simular confirmação da recepção</button><button class="btn outline" onclick="cancelPendingV4()">Cancelar solicitação</button></div>';
+      html+='</div>';
+      if(!active&&!pending)html+='<h2>Planos disponíveis</h2><div class="grid g2">'+plansV4.map((x,i)=>'<div class="card"><h3>'+x.name+'</h3><p class="muted">'+x.desc+'</p><h2>'+moneyV4(x.price)+' <small>/ mês</small></h2><button class="btn" onclick="checkoutV4('+i+')">Escolher plano</button></div>').join('')+'</div><p class="small-note">Valores ilustrativos para apresentação.</p>';
+      html+='<div class="card" style="margin-top:18px"><h2>Histórico de pagamentos simulados</h2>'+((p.history||[]).length?p.history.map(h=>'<div class="mini-row"><span>'+escapeHTML(h.name)+' · '+escapeHTML(h.method)+'<br><small>'+dateV4(h.paid)+'</small></span><strong>'+moneyV4(h.price)+'</strong></div>').join(''):'<p class="muted">Nenhum pagamento registrado.</p>')+'</div><button class="btn outline sm" style="margin-top:16px" onclick="resetPlanV4()">Reiniciar demonstração do plano</button>';el.innerHTML=html;
+    }
+    function checkoutV4(i){selectedPlanV4=i;methodV4='PIX';drawPaymentV4()}
+    function drawPaymentV4(){const p=plansV4[selectedPlanV4];openModal('Finalizar matrícula',p.name+' · '+moneyV4(p.price)+' por mês','<div class="chiprow">'+['PIX','Cartão','Dinheiro em espécie'].map(m=>'<button class="chip '+(methodV4===m?'selected':'')+'" onclick="methodV4='+ "'" +m+ "'" +';drawPaymentV4()">'+m+'</button>').join('')+'</div><div class="card" style="margin-top:12px">'+(methodV4==='PIX'?'<h3>PIX demonstrativo</h3><p>QR Code indisponível nesta versão. Nenhuma transferência será realizada.</p>':methodV4==='Cartão'?'<h3>Cartão demonstrativo</h3><p>Não informe dados reais de cartão. A aprovação será simulada.</p>':'<h3>Pagamento na recepção</h3><p>Compareça à recepção do Império Fitness para pagar em dinheiro. Aguarde a confirmação.</p>')+'</div><div class="actions"><button class="btn" onclick="payV4()">'+(methodV4==='Dinheiro em espécie'?'Solicitar pagamento presencial':'Simular pagamento aprovado')+'</button><button class="btn outline" onclick="closeModal()">Voltar</button></div>')}
+    function activateV4(p,method){const old=subscriptionV4(),d=new Date();d.setDate(d.getDate()+30);const due=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');const record={name:p.name,price:p.price,method,paid:todayV4(),due};state.subscriptionV4={...record,status:'active',history:[record,...(old.history||[])]};syncPlanV4();closeModal();$('expiredCover').classList.remove('visible');renderPlanV4();renderWorkout();toast('Pagamento simulado confirmado! Plano ativo.')}
+    function payV4(){const p=plansV4[selectedPlanV4];if(methodV4==='Dinheiro em espécie'){const old=subscriptionV4();state.subscriptionV4={...p,method:methodV4,status:'pending',history:old.history||[]};persist();closeModal();renderPlanV4();toast('Aguardando pagamento na recepção.')}else activateV4(p,methodV4)}
+    function confirmCashV4(){const p=subscriptionV4();if(p.status==='pending')activateV4(p,p.method)}
+    function cancelPendingV4(){const p=subscriptionV4();p.status='cancelled';persist();renderPlanV4()}
+    function expirePlanV4(){const p=subscriptionV4();p.status='expired';persist();renderPlanV4()}
+    function cancelPlanV4(){openModal('Cancelar plano','Escolha o motivo do cancelamento demonstrativo.','<div class="field"><label>Motivo</label><select id="cancelReasonV4"><option>Motivos financeiros</option><option>Falta de tempo</option><option>Mudança de academia</option><option>Outros motivos</option></select></div><p class="small-note">Na demonstração, o cancelamento encerra o acesso imediatamente.</p><div class="actions"><button class="btn danger" onclick="confirmCancelV4()">Confirmar cancelamento</button><button class="btn outline" onclick="closeModal()">Manter meu plano</button></div>')}
+    function confirmCancelV4(){const p=subscriptionV4();p.reason=$('cancelReasonV4').value;p.status='cancelled';persist();closeModal();renderPlanV4();renderWorkout();toast('Cancelamento simulado concluído.')}
+    function resetPlanV4(){if(!confirm('Reiniciar somente os dados demonstrativos do plano?'))return;delete state.subscriptionV4;state.plan=SERVER_ALUNO.plan||'Aguardando matrícula';state.expired=false;persist();updateHeader();renderPlanV4();renderWorkout()}
+    const navigateBeforePlanV4=navigate;
+    navigate=function(id){syncPlanV4();navigateBeforePlanV4(id);if(id==='plano')renderPlanV4()};
+    accountReadyV3.then(()=>{syncPlanV4();renderPlanV4();renderWorkout()});
+    renderPlanV4();
+
+</script>
 </body>
 
 </html>
